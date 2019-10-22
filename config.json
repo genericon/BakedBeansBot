@@ -1,0 +1,60 @@
+{
+  "description": "Now we're cooking with gas",
+  "server": 635588058145751051,
+  "group_roles": {
+    "@everyone": 635588058145751051,
+    "Alumni": 635639776237584384,
+    "Member": 635675898770620417,
+    "Officer": 635640352581091354,
+    "Admin Staff": 635602406821855242
+  },
+  "officer_roles": {
+    "Historian": 635634677822259201,
+    "Website Coordinator": 635634504471674920,
+    "Design Team Lead": 635634510247231488,
+    "Conbook Coordinator": 635634417351786507,
+    "Dance Coordinator": 635636475437776937,
+    "Contests Coordinator": 635636407204839464,
+    "Anime Coordinator": 635602236483043347,
+    "Sci-Fi Coordinator": 635602263749951508,
+    "Traditional Gaming Coordinator": 635634071606657024,
+    "Video Gaming Coordinator": 635602373825396802,
+    "Cosplay Story Coordinator": 637008690251038731,
+    "Cosplay Coordinator": 635602209425457162,
+    "Vendor Coordinator": 635602314354491393,
+    "Guest Coordinator": 635633736133771353,
+    "Panels Coordinator": 635602293625978901,
+    "Artist Coordinator": 635633634711437322,
+    "Technical Coordinator": 635634239496519731,
+    "Social Media Coordinator": 635641636025532427,
+    "Press Coordinator": 635633506805874689,
+    "Registration Coordinator": 635633405370957824,
+    "Treasurer": 635602193797611570,
+    "Operations": 635602414942289933,
+    "Vice Chair": 635602172150677547,
+    "Primary Chair": 635602155398758440
+  },
+  "activity": [
+    {"type": 0, "name": "FireCon Simulator 33"},
+    {"type": 0, "name": "Yandere Simulator (Baked Beans Mod)"},
+    {"type": 1, "name": "All the animu"},
+    {"type": 4, "name": "Struggling through sleep deprivation"},
+    {"type": 4, "name": "Brewing Coffee"},
+    {"type": 4, "name": "Printing Badges"},
+    {"type": 4, "name": "R E A D Y O U R E M A I L"},
+    {"type": 4, "name": "Screaming into the Void"},
+    {"type": 4, "name": "Locating Minion Pro"},
+    {"type": 4, "name": "Spending All The Money"},
+    {"type": 4, "name": "Ordering Equipment"},
+    {"type": 4, "name": "Searching For Robert Axelrod"},
+    {"type": 4, "name": "Running around like a decapitated chicken"},
+    {"type": 4, "name": "Hiding All The Glitter"},
+    {"type": 4, "name": "Putting Out The Fires"},
+    {"type": 4, "name": "Herding Attendes"}
+  ],
+  "responses": {
+    "kss": "#kss - Kawaii Suplex Squad Roll Out",
+    "senpai": "Senpai noticed me! ｡^‿^｡",
+    "extension cords": "Call the fire department!\nDid you clear that with EH&S?"
+  }
+}

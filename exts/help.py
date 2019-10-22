@@ -1,0 +1,96 @@
+import discord
+from discord import Colour
+from discord.ext.commands import HelpCommand
+
+
+class EmbedHelpCommand(HelpCommand):
+    """The implementation of the default help command.
+    This inherits from :class:`HelpCommand`.
+    It extends it with the following attributes.
+    Attributes
+    ------------
+    sort_commands: :class:`bool`
+        Whether to sort the commands in the output alphabetically. Defaults to ``True``.
+    dm_help: :class:`bool`
+        A bool that indicates if the help command should DM the user instead of
+        sending it to the channel it received it from. If the boolean is set to
+        ``True``, then all help output is DM'd. If ``False``, none of the help
+        output is DM'd. Defaults to ``False``.
+    commands_heading: :class:`str`
+        The command list's heading string used when the help command is invoked with a category name.
+        Useful for i18n. Defaults to ``"Commands:"``
+    """
+
+    def __init__(self, **options):
+        self.sort_commands = options.pop('sort_commands', True)
+        self.dm_help = options.pop('dm_help', False)
+        self.commands_heading = options.pop('commands_heading', "Commands:")
+
+        self.embed = discord.Embed(colour=Colour.green())
+
+        super().__init__(**options)
+
+
+    def get_ending_note(self):
+        """Returns help command's ending note. This is mainly useful to override for i18n purposes."""
+        command_name = self.invoked_with
+        return "Type {0}{1} command for more info on a command.".format(self.clean_prefix, command_name)
+
+    def add_commands(self, commands, *, heading):
+        """Indents a list of commands after the specified heading.
+        The formatting is added to the :attr:`embed`.
+        The default implementation is the command name followed by
+        the command's :attr:`Command.short_doc`.
+        Parameters
+        -----------
+        commands: Sequence[:class:`Command`]
+            A list of commands to indent for output.
+        heading: :class:`str`
+            The heading to add to the output. This is only added
+            if the list of commands is greater than 0.
+        """
+
+        if not commands:
+            return
+
+        if heading:
+            self.embed.title = heading
+
+        for command in commands:
+            self.embed = self.embed.add_field(name=command.name, value=command.short_doc, inline=False)
+
+    async def send_embed(self):
+        """A helper utility to send the page output from :attr:`embed` to the destination."""
+        destination = self.get_destination()
+        await destination.send(embed=self.embed)
+
+    def get_destination(self):
+        ctx = self.context
+        if self.dm_help is True:
+            return ctx.author
+        else:
+            return ctx.channel
+
+    async def prepare_help_command(self, ctx, command):
+        self.embed = discord.Embed(colour=Colour.green())
+        await super().prepare_help_command(ctx, command)
+
+    async def send_bot_help(self, mapping):
+        ctx = self.context
+        bot = ctx.bot
+
+        if bot.description:
+            self.embed.description = bot.description
+
+        filtered = await self.filter_commands(bot.commands, sort=self.sort_commands)
+        self.add_commands(filtered, heading=self.commands_heading)
+
+        note = self.get_ending_note()
+        if note:
+            self.embed = self.embed.add_field(name='Note', value=note, inline=True)
+
+        await self.send_embed()
+
+    async def send_command_help(self, command):
+        self.add_commands([command])
+        await self.send_embed()
