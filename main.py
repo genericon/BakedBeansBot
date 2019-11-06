@@ -5,8 +5,6 @@ import logging
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 import discord
 from discord.ext import commands
 
@@ -14,7 +12,6 @@ from exts import EmbedHelpCommand
 
 
 def config_load():
-    load_dotenv()
     with open('config.json', 'r', encoding='utf-8') as doc:
         # Please make sure encoding is correct, especially after editing the config file
         return json.load(doc)
