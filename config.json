@@ -1,11 +1,16 @@
 {
   "description": "Now we're cooking with gas",
   "server": 635588058145751051,
+  "appoint_roles": {
+    "Officer": ["Member"],
+    "Cosplay Story Coordinator": ["Cosplay Story Team"]
+  },
   "group_roles": {
     "@everyone": 635588058145751051,
     "Alumni": 635639776237584384,
     "Member": 635675898770620417,
     "Officer": 635640352581091354,
+    "Cosplay Story Team": 640672243839664138,
     "Admin Staff": 635602406821855242
   },
   "officer_roles": {
