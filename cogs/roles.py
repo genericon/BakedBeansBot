@@ -1,9 +1,9 @@
-import discord
 from discord import Colour
 from discord.ext import commands
 
 import functools
 import operator
+
 
 class RolesCog(commands.Cog):
     def __init__(self, bot):
@@ -33,7 +33,7 @@ class RolesCog(commands.Cog):
 
     @commands.command()
     async def appoint(self, ctx, role_str: str, target_user: int):
-        '''Appoint User to a Role'''
+        """Appoint User to a Role"""
         server = self.bot.get_guild(self.bot.config['server'])
         user = server.get_member(ctx.message.author.id)
         appoint_roles = self.bot.config['appoint_roles']
@@ -55,7 +55,7 @@ class RolesCog(commands.Cog):
             appointable_roles = functools.reduce(operator.iconcat, appointable_roles, [])
 
             if not any(map(lambda r: r.id == new_role.id, appointable_roles)):
-                await ctx.send(f'You are not authorized to appoint role "{role}"!')
+                await ctx.send(f'You are not authorized to appoint role "{new_role}"!')
                 return
 
         await target_member.add_roles(new_role)

@@ -5,6 +5,7 @@ from random import choice
 
 import logging
 
+
 class StatusCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -32,7 +33,8 @@ class StatusCog(commands.Cog):
         status = choice(statuses)
         status_text = status['name']
         # Waiting on Custom Status support for discord.py
-        #logging.info(f'Set Status to: {status_text}!')
+        # await self.bot.change_presence()
+        # logging.info(f'Set Status to: {status_text}!')
         await ctx.send(f'Status: "{status_text}"!')
 
 

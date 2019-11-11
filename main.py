@@ -10,10 +10,10 @@ INITIAL_EXTENSIONS = [
     'cogs.help',
     'cogs.admin',
     'cogs.general',
-    'cogs.ping',
     'cogs.status',
     'cogs.roles'
 ]
+
 
 def config_load():
     with open('config.json', 'r', encoding='utf-8') as doc:
@@ -58,7 +58,6 @@ class Bot(commands.Bot):
                 error = f'{extension}\n {type(e).__name__} : {e}'
                 logging.warning(f'Failed to load extension {error}')
 
-
     async def track_start(self):
         """
         Waits for the bot to connect to discord and then records the time.
@@ -67,7 +66,8 @@ class Bot(commands.Bot):
         await self.wait_until_ready()
         self.start_time = datetime.utcnow()
 
-    async def get_prefix_(self, bot, message):
+    @staticmethod
+    async def get_prefix_(bot, message):
         """
         A coroutine that returns a prefix.
 

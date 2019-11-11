@@ -2,6 +2,7 @@ import discord
 from discord import Colour
 from discord.ext import commands
 
+
 class EmbedHelpCommand(commands.HelpCommand):
     """The implementation of the default help command.
     This inherits from :class:`HelpCommand`.
@@ -29,33 +30,32 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         super().__init__(**options)
 
-
     def get_ending_note(self):
         """Returns help command's ending note. This is mainly useful to override for i18n purposes."""
         command_name = self.invoked_with
         return "Type {0}{1} command for more info on a command.".format(self.clean_prefix, command_name)
 
-    def add_commands(self, commands, *, heading):
+    def add_commands(self, commands_, *, heading):
         """Indents a list of commands after the specified heading.
         The formatting is added to the :attr:`embed`.
         The default implementation is the command name followed by
         the command's :attr:`Command.short_doc`.
         Parameters
         -----------
-        commands: Sequence[:class:`Command`]
+        commands_: Sequence[:class:`Command`]
             A list of commands to indent for output.
         heading: :class:`str`
             The heading to add to the output. This is only added
             if the list of commands is greater than 0.
         """
 
-        if not commands:
+        if not commands_:
             return
 
         if heading:
             self.embed.title = heading
 
-        for command in commands:
+        for command in commands_:
             self.embed = self.embed.add_field(name=command.name, value=command.short_doc, inline=False)
 
     async def send_embed(self):
@@ -70,7 +70,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         else:
             return ctx.channel
 
-    async def prepare_help_command(self, ctx, command):
+    async def prepare_help_command(self, ctx, command=None):
         self.embed = discord.Embed(colour=Colour.green())
         await super().prepare_help_command(ctx, command)
 
@@ -91,14 +91,16 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.send_embed()
 
     async def send_command_help(self, command):
-        self.add_commands([command])
+        self.add_commands([command], heading='')
         await self.send_embed()
+
 
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self._original_help_command = bot.help_command
         bot.help_command = EmbedHelpCommand()
         bot.help_command.cog = self
+        self.bot = bot
 
     def cog_unload(self):
         self.bot.help_command = self._original_help_command
