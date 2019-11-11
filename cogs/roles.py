@@ -5,7 +5,7 @@ from discord.ext import commands
 import functools
 import operator
 
-class RoleManagement(commands.Cog):
+class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -64,4 +64,4 @@ class RoleManagement(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(RoleManagement(bot))
+    bot.add_cog(RolesCog(bot))

@@ -1,9 +1,8 @@
 import discord
 from discord import Colour
-from discord.ext.commands import HelpCommand
+from discord.ext import commands
 
-
-class EmbedHelpCommand(HelpCommand):
+class EmbedHelpCommand(commands.HelpCommand):
     """The implementation of the default help command.
     This inherits from :class:`HelpCommand`.
     It extends it with the following attributes.
@@ -94,3 +93,16 @@ class EmbedHelpCommand(HelpCommand):
     async def send_command_help(self, command):
         self.add_commands([command])
         await self.send_embed()
+
+class HelpCog(commands.Cog):
+    def __init__(self, bot):
+        self._original_help_command = bot.help_command
+        bot.help_command = EmbedHelpCommand()
+        bot.help_command.cog = self
+
+    def cog_unload(self):
+        self.bot.help_command = self._original_help_command
+
+
+def setup(bot):
+    bot.add_cog(HelpCog(bot))

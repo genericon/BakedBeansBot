@@ -1,15 +1,19 @@
 import asyncio
-import datetime
+from datetime import datetime
+import discord
+from discord.ext import commands
 import json
 import logging
 import os
-from pathlib import Path
 
-import discord
-from discord.ext import commands
-
-from exts import EmbedHelpCommand
-
+INITIAL_EXTENSIONS = [
+    'cogs.help',
+    'cogs.admin',
+    'cogs.general',
+    'cogs.ping',
+    'cogs.status',
+    'cogs.roles'
+]
 
 def config_load():
     with open('config.json', 'r', encoding='utf-8') as doc:
@@ -37,8 +41,7 @@ class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(
             command_prefix=self.get_prefix_,
-            description=kwargs['description'],
-            help_command=EmbedHelpCommand()
+            description=kwargs['description']
         )
         self.start_time = None
         self.app_info = None
@@ -46,7 +49,15 @@ class Bot(commands.Bot):
         self.config = kwargs['config']
 
         self.loop.create_task(self.track_start())
-        self.loop.create_task(self.load_all_extensions())
+
+        for extension in INITIAL_EXTENSIONS:
+            try:
+                self.load_extension(extension)
+                logging.info(f'Loaded {extension}')
+            except Exception as e:
+                error = f'{extension}\n {type(e).__name__} : {e}'
+                logging.warning(f'Failed to load extension {error}')
+
 
     async def track_start(self):
         """
@@ -54,7 +65,7 @@ class Bot(commands.Bot):
         Can be used to work out uptime.
         """
         await self.wait_until_ready()
-        self.start_time = datetime.datetime.utcnow()
+        self.start_time = datetime.utcnow()
 
     async def get_prefix_(self, bot, message):
         """
@@ -65,22 +76,6 @@ class Bot(commands.Bot):
         """
         prefix = ['!', '?']
         return commands.when_mentioned_or(*prefix)(bot, message)
-
-    async def load_all_extensions(self):
-        """
-        Attempts to load all .py files in /cogs/ as cog extensions
-        """
-        await self.wait_until_ready()
-        # ensure that on_ready has completed and finished printing
-        await asyncio.sleep(1)
-        cogs = [x.stem for x in Path('cogs').glob('*.py')]
-        for extension in cogs:
-            try:
-                self.load_extension(f'cogs.{extension}')
-                logging.info(f'Loaded {extension}')
-            except Exception as e:
-                error = f'{extension}\n {type(e).__name__} : {e}'
-                logging.warning(f'Failed to load extension {error}')
 
     async def on_ready(self):
         """

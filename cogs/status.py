@@ -5,7 +5,7 @@ from random import choice
 
 import logging
 
-class NowPlaying(commands.Cog):
+class StatusCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,13 +28,13 @@ class NowPlaying(commands.Cog):
         Set a Random Status
         """
 
-        status_list = list(filter(lambda x: x['type'] == 4, self.bot.config['activity']))
-        status = choice(status_list)
+        statuses = list(filter(lambda x: x['type'] == 4, self.bot.config['activity']))
+        status = choice(statuses)
         status_text = status['name']
         # Waiting on Custom Status support for discord.py
-        #logging.info(f'Set Status to: {status_text}')
+        #logging.info(f'Set Status to: {status_text}!')
         await ctx.send(f'Status: "{status_text}"!')
 
 
 def setup(bot):
-    bot.add_cog(NowPlaying(bot))
+    bot.add_cog(StatusCog(bot))

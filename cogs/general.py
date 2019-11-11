@@ -3,7 +3,7 @@ from discord import Colour
 from discord.ext import commands
 
 
-class GeneralInfo(commands.Cog):
+class GeneralCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -38,4 +38,4 @@ class GeneralInfo(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(GeneralInfo(bot))
+    bot.add_cog(GeneralCog(bot))
