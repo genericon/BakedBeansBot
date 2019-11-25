@@ -95,7 +95,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.send_embed()
 
 
-class HelpCog(commands.Cog):
+class EmbedHelpCog(commands.Cog):
     def __init__(self, bot):
         self._original_help_command = bot.help_command
         bot.help_command = EmbedHelpCommand()
@@ -107,4 +107,4 @@ class HelpCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(HelpCog(bot))
+    bot.add_cog(EmbedHelpCog(bot))
