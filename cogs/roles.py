@@ -1,8 +1,8 @@
-from discord import Colour
 from discord.ext import commands
 
 import functools
 import operator
+import typings
 
 
 class RolesCog(commands.Cog):
@@ -11,7 +11,7 @@ class RolesCog(commands.Cog):
 
     @commands.command()
     @commands.dm_only()
-    async def change_color(self, ctx, color=None):
+    async def change_color(self, ctx, colour: typing.Optional[discord.Colour] = Colour.default()):
         """
         Change Role Color for Users
         """
@@ -23,30 +23,25 @@ class RolesCog(commands.Cog):
         if highest_role.id in self.bot.config['group_roles'].values():
             await ctx.send(f'Cannot change color for Group "{highest_role.name}"!')
         else:
-            if color:
-                colour = Colour(int(color, 16))
-            else:
-                colour = Colour.default()
-
             await highest_role.edit(colour=colour)
             await ctx.send(f'Updated color for "{highest_role.name}"!')
 
     @commands.command()
-    async def appoint(self, ctx, role_str: str, target_user: int):
+    async def appoint(self, ctx, new_role: discord.Role, target_member: discord.Member):
         """Appoint User to a Role"""
         server = self.bot.get_guild(self.bot.config['server'])
         user = server.get_member(ctx.message.author.id)
         appoint_roles = self.bot.config['appoint_roles']
 
-        new_role = next(filter(lambda r: r.name == role_str, server.roles), None)
-        if new_role is None:
-            await ctx.send(f'Invalid Role "{role_str}"!')
-            return
+        #new_role = next(filter(lambda r: r.name == role_str, server.roles), None)
+        #if new_role is None:
+        #    await ctx.send(f'Invalid Role "{role_str}"!')
+        #    return
 
-        target_member = server.get_member(target_user)
-        if target_member is None:
-            await ctx.send(f'Can\'t find user with id "{target_user}"!')
-            return
+        #target_member = server.get_member(target_user)
+        #if target_member is None:
+        #    await ctx.send(f'Can\'t find user with id "{target_user}"!')
+        #    return
 
         is_admin = any(map(lambda r: r.permissions.administrator, user.roles))
 
