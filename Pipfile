@@ -1,17 +1,17 @@
 [[source]]
 name = "pypi"
-url = "https://pypi.org/simple"
+url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [dev-packages]
 
 [packages]
 discord-py = "*"
+asyncpg = "*"
 
 [requires]
 python_version = "3.8"
 
 [scripts]
-start = "python main.py"
-build = "docker build -t genericon/baked-beans-bot -f Dockerfile ."
-deploy = "docker run --env-file env.list -d genericon/baked-beans-bot"
+build = "docker-compose build"
+deploy = "docker-compose up"

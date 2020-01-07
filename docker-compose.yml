@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bakedbeansbot
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: bakedbeans
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init-pg:/docker-entrypoint-initdb.d
+
+  bot:
+    build: .
+    image: genericon/baked-beans-bot
+    depends_on:
+      - db

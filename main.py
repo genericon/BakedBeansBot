@@ -1,5 +1,5 @@
 import asyncio
-# import aioredis
+import asyncpg
 from datetime import datetime
 import discord
 from discord.ext import commands
@@ -13,7 +13,7 @@ INITIAL_EXTENSIONS = [
     'cogs.general',
     'cogs.status',
     'cogs.roles'
-#    'cogs.profile'
+    'cogs.profile'
 ]
 
 
@@ -32,18 +32,21 @@ async def run():
     config = config_load()
     description = config.pop('description')
 
-    # redis_uri = config.pop('redis_uri')
-    # redis = await aioredis.create_connection(redis_uri)
-    redis = None
+    db = await asyncpg.create_pool(
+        user=os.getenv('POSTGRES_USER'),
+        password=os.getenv('POSTGRES_PASSWORD'),
+        database=os.getenv('POSTGRES_DB'),
+        host=os.getenv('POSTGRES_HOST')
+    )
 
     bot = Bot(config=config,
               description=description,
-              redis=redis)
+              db=db)
     try:
         await bot.start(os.getenv('DISCORD_BOT_TOKEN'))
     except KeyboardInterrupt:
         await bot.logout()
-        # await redis.close()
+        await db.close()
 
 
 class Bot(commands.Bot):
@@ -55,7 +58,7 @@ class Bot(commands.Bot):
         self.start_time = None
         self.app_info = None
 
-        # self.redis = kwargs['redis']
+        self.db = kwargs['db']
 
         self.config = kwargs['config']
 

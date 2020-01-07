@@ -9,9 +9,12 @@ class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def is_rsfa(ctx):
+        return ctx.guild and ctx.guild.id == ctx.bot.config['server']
+
     @commands.command()
     @commands.dm_only()
-    async def change_color(self, ctx, colour: typing.Optional[discord.Colour] = Colour.default()):
+    async def change_color(self, ctx, colour: typing.Optional[discord.Colour]):
         """
         Change Role Color for Users
         """
@@ -19,6 +22,8 @@ class RolesCog(commands.Cog):
         server = self.bot.get_guild(self.bot.config['server'])
         user = server.get_member(ctx.message.author.id)
         highest_role = user.roles[-1]
+        if colour is None:
+            colour = Colour.default()
 
         if highest_role.id in self.bot.config['group_roles'].values():
             await ctx.send(f'Cannot change color for Group "{highest_role.name}"!')
@@ -26,22 +31,14 @@ class RolesCog(commands.Cog):
             await highest_role.edit(colour=colour)
             await ctx.send(f'Updated color for "{highest_role.name}"!')
 
+
     @commands.command()
+    @commands.check(is_rsfa)
     async def appoint(self, ctx, new_role: discord.Role, target_member: discord.Member):
         """Appoint User to a Role"""
         server = self.bot.get_guild(self.bot.config['server'])
         user = server.get_member(ctx.message.author.id)
         appoint_roles = self.bot.config['appoint_roles']
-
-        #new_role = next(filter(lambda r: r.name == role_str, server.roles), None)
-        #if new_role is None:
-        #    await ctx.send(f'Invalid Role "{role_str}"!')
-        #    return
-
-        #target_member = server.get_member(target_user)
-        #if target_member is None:
-        #    await ctx.send(f'Can\'t find user with id "{target_user}"!')
-        #    return
 
         is_admin = any(map(lambda r: r.permissions.administrator, user.roles))
 
