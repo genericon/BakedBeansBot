@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 import functools
@@ -5,12 +6,13 @@ import operator
 import typings
 
 
+async def is_rsfa(ctx):
+    return ctx.guild and ctx.guild.id == ctx.bot.config['server']
+
 class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def is_rsfa(ctx):
-        return ctx.guild and ctx.guild.id == ctx.bot.config['server']
 
     @commands.command()
     @commands.dm_only()

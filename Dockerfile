@@ -16,4 +16,9 @@ COPY . .
 # Install project dependencies
 RUN pipenv install --system --deploy
 
+# Install wait-for-it
+RUN apt-get update && apt-get install -y \
+    wait-for-it \
+    && rm -rf /var/lib/apt/lists/*
+
 CMD [ "python", "./main.py" ]

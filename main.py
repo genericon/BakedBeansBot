@@ -12,7 +12,7 @@ INITIAL_EXTENSIONS = [
     'cogs.admin',
     'cogs.general',
     'cogs.status',
-    'cogs.roles'
+    'cogs.roles',
     'cogs.profile'
 ]
 
@@ -32,12 +32,7 @@ async def run():
     config = config_load()
     description = config.pop('description')
 
-    db = await asyncpg.create_pool(
-        user=os.getenv('POSTGRES_USER'),
-        password=os.getenv('POSTGRES_PASSWORD'),
-        database=os.getenv('POSTGRES_DB'),
-        host=os.getenv('POSTGRES_HOST')
-    )
+    db = await asyncpg.create_pool()
 
     bot = Bot(config=config,
               description=description,

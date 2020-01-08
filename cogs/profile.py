@@ -34,21 +34,20 @@ class ProfileCog(commands.Cog):
                 ''', user.id)
 
         for rec in results:
-            if rec.service is 'MyAnimeList':
-                link = f'https://myanimelist.net/profile/{url_quote(rec.username)}'
-            elif rec.service is 'AniList':
-                text = f'https://anilist.co/user/{url_quote(rec.username)}/'
-            elif rec.service is 'VNDB':
-                text = f'https://vndb.org/{url_quote(rec.username)}'
+            if rec['service'] is 'MyAnimeList':
+                link = f'https://myanimelist.net/profile/{url_quote(rec['username'])}'
+            elif rec['service'] is 'AniList':
+                text = f'https://anilist.co/user/{url_quote(rec['username'])}/'
+            elif rec['service'] is 'VNDB':
+                text = f'https://vndb.org/{url_quote(rec['username'])}'
 
-            value = f'[{escape_markdown(rec.username)}]({link})'
+            value = f'[{escape_markdown(rec['username'])}]({link})'
 
             embed = embed.add_field(
                 name=rec.service,
                 value=value,
                 inline=True
             )
-
 
         await ctx.send(embed=embed)
 
