@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+import asyncio
+
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
@@ -7,13 +9,13 @@ class AdminCog(commands.Cog):
 
     @commands.command()
     @commands.dm_only()
-    async def delete_dm(self, ctx, msg_id: int):
+    async def delete_dm(self, ctx, msgs: commands.Greedy[discord.Message]):
         """
         Delete DM's from Bot
         """
-
-        msg = await ctx.message.channel.fetch_message(msg_id)
-        await msg.delete()
+        await asyncio.gather(
+            *(msg.delete() for msg in filter(lambda m: m.channel is ctx.channel, msgs))
+        )
 
 
 def setup(bot):
