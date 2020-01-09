@@ -131,3 +131,6 @@ dmypy.json
 
 # Docker (pg)
 postgres-data
+
+# PyCharm (extra)
+.idea

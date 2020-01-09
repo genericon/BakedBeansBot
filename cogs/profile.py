@@ -34,11 +34,11 @@ class ProfileCog(commands.Cog):
                 ''', user.id)
 
         for rec in results:
-            if rec['service'] is 'MyAnimeList':
+            if rec['service'] == 'MyAnimeList':
                 link = f"https://myanimelist.net/profile/{url_quote(rec['username'])}"
-            elif rec['service'] is 'AniList':
+            elif rec['service'] == 'AniList':
                 text = f"https://anilist.co/user/{url_quote(rec['username'])}/"
-            elif rec['service'] is 'VNDB':
+            elif rec['service'] == 'VNDB':
                 text = f"https://vndb.org/{url_quote(rec['username'])}"
 
             value = f"[{escape_markdown(rec['username'])}]({link})"

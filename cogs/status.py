@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from random import choice
+import random
 import logging
 
 
@@ -16,7 +16,7 @@ class StatusCog(commands.Cog):
         """
 
         games = list(filter(lambda x: x['type'] == 0, self.bot.config['activity']))
-        game = choice(games)
+        game = random.choice(games)
         game_name = game['name']
         await self.bot.change_presence(activity=discord.Game(name=game_name))
         logging.info(f'Set Presense to: {game_name}')
@@ -29,7 +29,7 @@ class StatusCog(commands.Cog):
         """
 
         statuses = list(filter(lambda x: x['type'] == 4, self.bot.config['activity']))
-        status = choice(statuses)
+        status = random.choice(statuses)
         status_text = status['name']
         # Waiting on Custom Status support for discord.py
         # await self.bot.change_presence()

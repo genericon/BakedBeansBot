@@ -19,13 +19,14 @@ class GeneralCog(commands.Cog):
             colour=Colour.blue()
         ).add_field(
             name='Contributing',
-            value='Check out the source on GitHub: https://github.com/genericon/BakedBeansBot',
+            value='Check out the source on [GitHub](https://github.com/genericon/BakedBeansBot)',
             inline=False
         ).add_field(
             name='License',
             value='BakedBeansBot is released under the MIT License',
             inline=False
         )
+
         await ctx.send(embed=embed)
 
     @commands.command()
