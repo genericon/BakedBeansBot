@@ -37,7 +37,7 @@ class RolesCog(commands.Cog):
 
     @commands.command()
     @commands.check(is_rsfa)
-    async def appoint(self, ctx, new_role: discord.Role, target_member: discord.Member):
+    async def appoint(self, ctx, target_member: discord.Member, new_role: discord.Role):
         """Appoint User to a Role"""
         server = self.bot.get_guild(self.bot.config['server'])
         user = server.get_member(ctx.message.author.id)
@@ -55,7 +55,7 @@ class RolesCog(commands.Cog):
 
         await target_member.add_roles(new_role)
 
-        await ctx.send("Success")
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
 def setup(bot):
