@@ -33,7 +33,7 @@ class EmbedHelpCommand(commands.HelpCommand):
     def get_ending_note(self):
         """Returns help command's ending note. This is mainly useful to override for i18n purposes."""
         command_name = self.invoked_with
-        return "Type {0}{1} command for more info on a command.".format(self.clean_prefix, command_name)
+        return f"Type {self.clean_prefix}{command_name} command for more info on a command."
 
     def add_commands(self, commands_, *, heading):
         """Indents a list of commands after the specified heading.

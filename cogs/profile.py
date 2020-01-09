@@ -5,6 +5,9 @@ from discord.utils import escape_markdown
 from urllib.parse import quote as url_quote
 
 import logging
+import typing
+
+# import tempfile
 
 
 class ProfileCog(commands.Cog):
@@ -19,7 +22,7 @@ class ProfileCog(commands.Cog):
 
         embed = discord.Embed(
             title='Profile',
-            description=author.name,
+            description=user.name,
             colour=Colour.blue()
         )
 
@@ -29,7 +32,7 @@ class ProfileCog(commands.Cog):
                 results = await conn.fetch('''
                     SELECT service, username
                     FROM profile_data
-                    WHERE uid = $i
+                    WHERE uid = $1
                     ORDER BY service DESC
                 ''', user.id)
 
@@ -52,7 +55,7 @@ class ProfileCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def setProfileEntry(self, ctx, user: typing.Optional[discord.User], service: str, username: str):
+    async def profile_set(self, ctx, user: typing.Optional[discord.User], service: str, username: str):
         if user is None:
             user = ctx.message.author
 
@@ -74,7 +77,7 @@ class ProfileCog(commands.Cog):
 
 
     @commands.command()
-    async def delProfileEntry(self, ctx, user: typing.Optional[discord.User], service: str):
+    async def profile_del(self, ctx, user: typing.Optional[discord.User], service: str):
         if user is None:
             user = ctx.message.author
 
@@ -87,10 +90,32 @@ class ProfileCog(commands.Cog):
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
+    """
+    @commands.command()
+    async def profile_export(self, ctx):
+        with tempfile.TemporaryFile() as fp:
+            async with self.bot.db.acquire() as conn:
+                async with conn.transaction():
+                    await conn.copy_from_table('profile_data', output=fp, format='csv')
+            fp.seek(0)
+            await ctx.send(file=discord.File(fp, 'export.csv'))
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+
+
+    @commands.command()
+    async def profile_import(self, ctx):
+        attached = ctx.message.attachments[0]
+        with tempfile.TemporaryFile() as fp:
+            await attached.save(fp, seek_begin=True)
+            async with self.bot.db.acquire() as conn:
+                async with conn.transaction():
+                    await conn.copy_to_table('profile_data', source=fp, format='csv')
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+    """
 
     """
     @commands.command()
-    async def profileDataMigration(self, ctx):
+    async def profile_import_channel(self, ctx):
         # Loop through every message in #mal-anilist-vndb-etc-share
         # for initial data migration
         # This is going to be 'fun'
