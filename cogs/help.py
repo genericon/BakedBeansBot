@@ -59,7 +59,7 @@ class EmbedHelpCommand(commands.HelpCommand):
             if command.short_doc:
                 self.embed = self.embed.add_field(name=command.name, value=command.short_doc, inline=False)
             else:
-                self.embed = self.embed.add_field(name=command.name, value='\u200b', inline=True)
+                self.embed = self.embed.add_field(name=command.name, value='\u200b', inline=False)
 
     async def send_embed(self):
         """A helper utility to send the page output from :attr:`embed` to the destination."""

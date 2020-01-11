@@ -1,20 +1,23 @@
 version: '3.7'
 
 services:
-  db:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB}"
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-      - ./init-pg:/docker-entrypoint-initdb.d
+#  db:
+#    image: postgres
+#    restart: always
+#    environment:
+#      POSTGRES_USER: "${POSTGRES_USER}"
+#      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+#      POSTGRES_DB: "${POSTGRES_DB}"
+#    volumes:
+#      - ./postgres-data:/var/lib/postgresql/data
+#      - ./init-pg:/docker-entrypoint-initdb.d
 
   bot:
     build: .
     image: genericon/baked-beans-bot
+    network_mode: "bridge"
+    extra_hosts:
+      - "db:172.17.0.1"
     environment:
       PGHOST: "db"
       PGUSER: "${POSTGRES_USER}"
@@ -22,5 +25,3 @@ services:
       PGPASSWORD: "${POSTGRES_PASSWORD}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
     command: [ "wait-for-it", "db:5432", "--", "python", "./main.py" ]
-    depends_on:
-      - db

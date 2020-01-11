@@ -23,8 +23,10 @@ class ProfileCog(commands.Cog):
         embed = discord.Embed(
             title='Profile',
             description=user.name,
-            colour=Colour.blue()
+            colour=discord.Colour.blue()
         )
+
+        logging.info(f'Getting profile data for "{user.id}"')
 
         results = []
         async with self.bot.db.acquire() as conn:
@@ -37,17 +39,20 @@ class ProfileCog(commands.Cog):
                 ''', user.id)
 
         for rec in results:
-            if rec['service'] == 'MyAnimeList':
-                link = f"https://myanimelist.net/profile/{url_quote(rec['username'])}"
-            elif rec['service'] == 'AniList':
-                text = f"https://anilist.co/user/{url_quote(rec['username'])}/"
-            elif rec['service'] == 'VNDB':
-                text = f"https://vndb.org/{url_quote(rec['username'])}"
+            service, username = rec['service'], rec['username']
+            logging.debug(f'"{user.id}" "{service}" "{username}"')
 
-            value = f"[{escape_markdown(rec['username'])}]({link})"
+            if service == 'MyAnimeList':
+                link = f"https://myanimelist.net/profile/{url_quote(username)}"
+            elif service == 'AniList':
+                text = f"https://anilist.co/user/{url_quote(username)}/"
+            elif service == 'VNDB':
+                text = f"https://vndb.org/{url_quote(username)}"
+
+            value = f"[{escape_markdown(username)}]({link})"
 
             embed = embed.add_field(
-                name=rec.service,
+                name=service,
                 value=value,
                 inline=True
             )
@@ -72,6 +77,8 @@ class ProfileCog(commands.Cog):
                     DO UPDATE
                     SET username = $3
                 ''', user.id, service, username)
+
+        logging.info(f'Set Service "{service}" to username "{username}" for "{user.id}"')
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
