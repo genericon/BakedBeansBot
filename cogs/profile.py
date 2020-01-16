@@ -13,7 +13,7 @@ import typing
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.services = ['MyAnimeList', 'AniList', 'VNDB']
+        self.services = ['MyAnimeList', 'AniList', 'VNDB', 'MyFigureCollection']
 
     @commands.command()
     async def profile(self, ctx, user: typing.Optional[discord.User]):
@@ -45,9 +45,11 @@ class ProfileCog(commands.Cog):
             if service == 'MyAnimeList':
                 link = f"https://myanimelist.net/profile/{url_quote(username)}"
             elif service == 'AniList':
-                text = f"https://anilist.co/user/{url_quote(username)}/"
+                link = f"https://anilist.co/user/{url_quote(username)}/"
             elif service == 'VNDB':
-                text = f"https://vndb.org/{url_quote(username)}"
+                link = f"https://vndb.org/{url_quote(username)}"
+            elif service == 'MyFigureCollection':
+                link = f"https://myfigurecollection.net/profile/{url_quote(username)}"
 
             value = f"[{escape_markdown(username)}]({link})"
 
