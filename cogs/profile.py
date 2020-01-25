@@ -77,7 +77,7 @@ class ProfileCog(commands.Cog):
                     VALUES ($1, $2, $3)
                     ON CONFLICT (uid, service)
                     DO UPDATE
-                    SET username = $3
+                    SET username = EXCLUDED.username
                 ''', user.id, service, username)
 
         logging.info(f'Set Service "{service}" to username "{username}" for "{user.id}"')
