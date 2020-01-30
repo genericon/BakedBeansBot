@@ -10,8 +10,8 @@ class GeneralCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if self.bot.user.id in message.raw_mentions:
-            await message.channel.send(f'Hai, <@!${self.bot.user.id}> Desu')
-        
+            await message.channel.send(f'Hai, ${self.bot.user.mention} Desu')
+
     @commands.command(aliases=['about'])
     async def info(self, ctx):
         """
