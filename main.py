@@ -47,7 +47,7 @@ async def run():
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(
-            command_prefix=self.get_prefix_,
+            command_prefix=commands.when_mentioned_or('bbb.'),
             description=kwargs['description']
         )
         self.start_time = None
@@ -74,17 +74,6 @@ class Bot(commands.Bot):
         """
         await self.wait_until_ready()
         self.start_time = datetime.utcnow()
-
-    @staticmethod
-    async def get_prefix_(bot, message):
-        """
-        A coroutine that returns a prefix.
-
-        I have made this a coroutine just to show that it can be done. If you needed async logic in here it can be done.
-        A good example of async logic would be retrieving a prefix from a database.
-        """
-        prefix = ['!', '?']
-        return commands.when_mentioned_or(*prefix)(bot, message)
 
     async def on_ready(self):
         """
