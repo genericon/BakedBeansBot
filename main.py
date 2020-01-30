@@ -47,7 +47,7 @@ async def run():
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(
-            command_prefix=commands.when_mentioned_or('bbb.'),
+            command_prefix=('bbb.',),
             description=kwargs['description']
         )
         self.start_time = None
