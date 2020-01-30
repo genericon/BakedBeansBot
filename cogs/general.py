@@ -9,6 +9,8 @@ class GeneralCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if self.bot.user.id == message.author.id:
+            return
         if self.bot.user.id in message.raw_mentions:
             await message.channel.send(f'Hai, ${self.bot.user.mention} Desu')
 
