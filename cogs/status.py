@@ -31,9 +31,9 @@ class StatusCog(commands.Cog):
         statuses = list(filter(lambda x: x['type'] == 4, self.bot.config['activity']))
         status = random.choice(statuses)
         status_text = status['name']
-        # Waiting on Custom Status support for discord.py
-        # await self.bot.change_presence()
-        # logging.info(f'Set Status to: {status_text}!')
+        # TODO: Emoji Support
+        await self.bot.change_presence(activity=discord.CustomActivity(name=status_text))
+        logging.info(f'Set Status to: {status_text}!')
         await ctx.send(f'Status: "{status_text}"!')
 
 
