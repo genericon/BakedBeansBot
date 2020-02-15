@@ -30,19 +30,20 @@ class EventsCog(commands.Cog):
                     events.name as event_name,
                     events.id as event_id
                     FROM event_data
-                    INNER JOIN events
-                    ON event_data.event_id = events.id
-                    WHERE events.server_id = $1 AND event_data.uid = $2
+                    INNER JOIN events ON
+                    event_data.event_id = events.id
+                    WHERE
+                    events.server_id = $1 AND
+                    event_data.uid = $2
                     ORDER BY event_name DESC
                 ''', ctx.guild.id, user.id)
 
-        for rec in results:
-            name = rec['event_name']
 
+        for rec in results:
             embed = embed.add_field(
-                name=service,
-                value=value,
-                inline=True
+                name=rec['event_name'],
+                value=rec['event_id'],
+                inline=False
             )
 
         await ctx.send(embed=embed)
