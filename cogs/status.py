@@ -78,7 +78,7 @@ class StatusCog(commands.Cog):
         """
 
         if not change:
-            await self.bot.change_presence()
+            await self.bot.change_presence(activity=None)
             return
 
 
