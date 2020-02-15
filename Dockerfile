@@ -9,9 +9,11 @@ ENV PIP_NO_CACHE_DIR=false \
 # Install pipenv
 RUN pip install -U pipenv
 
-# Copy project files into working directory
 WORKDIR /bot
-COPY . .
+
+# Copy Pipfiles
+COPY Pipfile Pipfile
+COPY Pipfile.lock Pipfile.lock
 
 # Install project dependencies
 RUN pipenv install --system --deploy
@@ -20,5 +22,8 @@ RUN pipenv install --system --deploy
 RUN apt-get update && apt-get install -y \
     wait-for-it \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy project files into working directory
+COPY . .
 
 CMD [ "python", "./main.py" ]
