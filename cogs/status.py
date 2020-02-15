@@ -77,9 +77,8 @@ class StatusCog(commands.Cog):
         Clear Presence
         """
 
-        if not change:
-            await self.bot.change_presence(activity=None)
-            return
+        await self.bot.change_presence(activity=None)
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
 def setup(bot):
