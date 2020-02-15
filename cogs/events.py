@@ -132,6 +132,9 @@ class EventsCog(commands.Cog):
                                 (uid, event_id)
                                 VALUES ($1, $2)
                             ''', member.id, event_id)
+            await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        else:
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')        
 
 
 def setup(bot):
