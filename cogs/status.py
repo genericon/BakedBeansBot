@@ -10,7 +10,7 @@ class StatusCog(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def play(self, ctx):
+    async def game_presence(self, ctx):
         """
         Play a Random Game
         """
@@ -38,7 +38,7 @@ class StatusCog(commands.Cog):
         await ctx.send(f'Now Playing: "{game_name}"!')
 
     @commands.command()
-    async def status(self, ctx):
+    async def activity_presence(self, ctx):
         """
         Set a Random Status
         """
@@ -70,6 +70,16 @@ class StatusCog(commands.Cog):
         await self.bot.change_presence(activity=status)
         logging.info(f'Set Status to: "{name}" "{status_text}"!')
         await ctx.send(f'Status: "{name}" "{status_text}"!')
+
+    @commands.command()
+    async def clear_presence(self, ctx):
+        """
+        Clear Presence
+        """
+
+        if not change:
+            await self.bot.change_presence()
+            return
 
 
 def setup(bot):
