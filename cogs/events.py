@@ -32,7 +32,7 @@ class EventsCog(commands.Cog):
                     FROM event_data
                     INNER JOIN events
                     ON event_data.event_id = events.id
-                    WHERE event_data.server_id = $1 AND event_data.uid = $2
+                    WHERE events.server_id = $1 AND event_data.uid = $2
                     ORDER BY event_name DESC
                 ''', ctx.guild.id, user.id)
 
@@ -103,12 +103,13 @@ class EventsCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
     """
 
+    """
     @commands.command()
     @commands.dm_only()
-    async def events_import_server(self, ctx):
-        # Import all roles in Weeb Poly Server into the db
+    async def events_import_server(self, ctx, server_id: int):
+        # Import all server roles into the db
         # Filter through them manually later
-        server = self.bot.get_guild(635261572247322639)
+        server = self.bot.get_guild(server_id)
 
         if server is not None:
             async with self.bot.db.acquire() as conn:
@@ -139,7 +140,8 @@ class EventsCog(commands.Cog):
                             ''', member.id, event_id)
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         else:
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')        
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+    """
 
 
 def setup(bot):
