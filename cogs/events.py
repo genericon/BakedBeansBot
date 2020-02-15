@@ -118,9 +118,11 @@ class EventsCog(commands.Cog):
                             INSERT INTO events
                             (role_id, name, server_id)
                             VALUES ($1, $2, $3)
+                            ON CONFLICT
+                            DO NOTHING
                         ''', role.id, role.name, role.guild.id)
 
-                    event_id = await connection.fetchval('''
+                    event_id = await conn.fetchval('''
                         SELECT id
                         FROM event
                         WHERE role_id = $1
@@ -132,6 +134,8 @@ class EventsCog(commands.Cog):
                                 INSERT INTO event_data
                                 (uid, event_id)
                                 VALUES ($1, $2)
+                                ON CONFLICT
+                                DO NOTHING
                             ''', member.id, event_id)
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         else:
