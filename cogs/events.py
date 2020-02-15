@@ -32,9 +32,9 @@ class EventsCog(commands.Cog):
                     FROM event_data
                     INNER JOIN events
                     ON event_data.event_id = events.id
-                    WHERE event_data.uid = $1 AND event_data.server_id = $2
+                    WHERE event_data.server_id = $1 AND event_data.uid = $2
                     ORDER BY event_name DESC
-                ''', user.id, )
+                ''', ctx.guild.id, user.id)
 
         for rec in results:
             name = rec['event_name']
