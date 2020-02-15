@@ -13,7 +13,8 @@ INITIAL_EXTENSIONS = [
     'cogs.general',
     'cogs.status',
     'cogs.roles',
-    'cogs.profile'
+    'cogs.profile',
+    'cogs.events'
 ]
 
 
