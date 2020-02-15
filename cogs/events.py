@@ -61,7 +61,7 @@ class EventsCog(commands.Cog):
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
-"""
+    """
     @commands.command()
     async def event_add_user(self, ctx, user: typing.Optional[discord.User], service: str):
         if user is None:
@@ -101,7 +101,7 @@ class EventsCog(commands.Cog):
         logging.info(f'Set Service "{service}" to username "{username}" for "{user.id}"')
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
-"""
+    """
 
     @commands.command()
     @commands.dm_only()
