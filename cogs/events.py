@@ -31,10 +31,10 @@ class EventsCog(commands.Cog):
                     events.id as event_id
                     FROM event_data
                     INNER JOIN events ON
-                    event_data.event_id = events.id
+                    events_data.event_id = events.id
                     WHERE
                     events.server_id = $1 AND
-                    event_data.uid = $2
+                    events_data.uid = $2
                     ORDER BY event_name DESC
                 ''', ctx.guild.id, user.id)
 
@@ -133,7 +133,7 @@ class EventsCog(commands.Cog):
                     async with conn.transaction():
                         for member in role.members:
                             await conn.execute('''
-                                INSERT INTO event_data
+                                INSERT INTO events_data
                                 (uid, event_id)
                                 VALUES ($1, $2)
                                 ON CONFLICT
