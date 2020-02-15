@@ -109,15 +109,16 @@ class EventsCog(commands.Cog):
         # Import all roles in Weeb Poly Server into the db
         # Filter through them manually later
         server = self.bot.get_guild(635261572247322639)
+
         if server is not None:
             async with self.bot.db.acquire() as conn:
                 for role in server.roles:
                     async with conn.transaction():
                         await conn.execute('''
                             INSERT INTO events
-                            (role_id, server_id)
-                            VALUES ($1, $2)
-                        ''', role.id, server.id)
+                            (role_id, name, server_id)
+                            VALUES ($1, $2, $3)
+                        ''', role.id, role.name, role.guild.id)
 
                     event_id = await connection.fetchval('''
                         SELECT id
