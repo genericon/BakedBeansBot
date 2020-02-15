@@ -124,7 +124,7 @@ class EventsCog(commands.Cog):
 
                     event_id = await conn.fetchval('''
                         SELECT id
-                        FROM event
+                        FROM events
                         WHERE role_id = $1
                     ''', role.id)
 
