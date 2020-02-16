@@ -29,7 +29,7 @@ class EventsCog(commands.Cog):
                     SELECT
                     events.name as event_name,
                     events.id as event_id
-                    FROM event_data
+                    FROM events_data
                     INNER JOIN events ON
                     events_data.event_id = events.id
                     WHERE
