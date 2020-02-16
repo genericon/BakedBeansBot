@@ -28,21 +28,27 @@ class EventsCog(commands.Cog):
                 results = await conn.fetch('''
                     SELECT
                     events.name as event_name,
-                    events.id as event_id
+                    attendance.count as event_attendance
                     FROM events_data
                     INNER JOIN events ON
                     events_data.event_id = events.id
+                    INNER JOIN (
+                        SELECT event_id,
+                        COUNT(event_id) as count
+                        FROM events_data
+                        GROUP BY event_id
+                    ) attendance USING (event_id)
                     WHERE
                     events.server_id = $1 AND
                     events_data.uid = $2
-                    ORDER BY event_name DESC
+                    ORDER BY events.id ASC
                 ''', ctx.guild.id, user.id)
 
 
         for rec in results:
             embed = embed.add_field(
                 name=rec['event_name'],
-                value=rec['event_id'],
+                value=rec['event_attendance'],
                 inline=False
             )
 
