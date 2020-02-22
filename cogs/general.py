@@ -7,16 +7,6 @@ class GeneralCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if self.bot.user.id in message.raw_mentions:
-            self.bot.dispatch('mention', message)
-
-    @commands.Cog.listener()
-    async def on_mention(self, message):
-        if self.bot.user.id is not message.author.id:
-            await message.channel.send(f'Hai, {self.bot.user.mention} Desu')
-
     @commands.command(aliases=['about'])
     async def info(self, ctx):
         """

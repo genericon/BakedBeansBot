@@ -11,6 +11,7 @@ INITIAL_EXTENSIONS = [
     'cogs.help',
     'cogs.admin',
     'cogs.general',
+    'cogs.poke',
     'cogs.status',
     'cogs.roles',
     'cogs.profile',
