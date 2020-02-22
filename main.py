@@ -6,6 +6,7 @@ from discord.ext import commands
 import json
 import logging
 import os
+import traceback
 
 INITIAL_EXTENSIONS = [
     'cogs.help',
@@ -99,11 +100,12 @@ class Bot(commands.Bot):
             return
         await self.process_commands(message)
 
+    async def on_command_error(self, context, exception):
+        tb = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+        logging.error(f'Ignoring exception in command {context.command}:\n{tb}')
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    # logger = logging.getLogger('discord.client')
-    # logger.setLevel(logging.DEBUG)
-
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())
