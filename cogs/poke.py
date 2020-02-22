@@ -1,16 +1,10 @@
 import discord
-from discord import Colour
 from discord.ext import commands
 
 
 class PokeCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if self.bot.user.id in message.raw_mentions:
-            self.bot.dispatch('mention', message)
 
     @commands.Cog.listener()
     async def on_mention(self, message):
