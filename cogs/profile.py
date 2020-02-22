@@ -28,7 +28,6 @@ class ProfileCog(commands.Cog):
 
         logging.info(f'Getting profile data for "{user.id}"')
 
-        results = []
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                 results = await conn.fetch('''
@@ -130,6 +129,7 @@ class ProfileCog(commands.Cog):
         # This is going to be 'fun'
         return
     """
+
 
 def setup(bot):
     bot.add_cog(ProfileCog(bot))

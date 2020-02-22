@@ -44,7 +44,6 @@ class EventsCog(commands.Cog):
                     ORDER BY events.id ASC
                 ''', ctx.guild.id, user.id)
 
-
         for rec in results:
             embed = embed.add_field(
                 name=rec['event_name'],

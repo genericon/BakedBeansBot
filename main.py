@@ -102,8 +102,8 @@ class Bot(commands.Bot):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    #logger = logging.getLogger('discord.client')
-    #logger.setLevel(logging.DEBUG)
+    # logger = logging.getLogger('discord.client')
+    # logger.setLevel(logging.DEBUG)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())

@@ -1,4 +1,5 @@
 import discord
+from discord import Colour
 from discord.ext import commands
 
 import functools
