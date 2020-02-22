@@ -11,7 +11,7 @@ class PokeCog(commands.Cog):
         if self.bot.user.id is not message.author.id:
             ctx = await self.bot.get_context(message)
             ctx.command = self.bot.get_command('poke')
-            await self.invoke(ctx)
+            await self.bot.invoke(ctx)
 
     @commands.command()
     async def poke(self, ctx):
