@@ -30,7 +30,8 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         super().__init__(**options)
 
-    def get_ending_note(self):
+    @property
+    def ending_note(self):
         """Returns help command's ending note. This is mainly useful to override for i18n purposes."""
         command_name = self.invoked_with
         return f"Type {self.clean_prefix}{command_name} command for more info on a command."
@@ -56,22 +57,29 @@ class EmbedHelpCommand(commands.HelpCommand):
             self.embed.title = heading
 
         for command in commands_:
+            val = '\u200b'
             if command.short_doc:
-                self.embed = self.embed.add_field(name=command.name, value=command.short_doc, inline=False)
-            else:
-                self.embed = self.embed.add_field(name=command.name, value='\u200b', inline=False)
+                val = command.short_doc
+                if len(command.aliases) != 0:
+                    val += f'\n*Aliases:* {", ".join(command.aliases)}'
 
-    async def send_embed(self):
-        """A helper utility to send the page output from :attr:`embed` to the destination."""
-        destination = self.get_destination()
-        await destination.send(embed=self.embed)
+            self.embed = self.embed.add_field(
+                name=command.name,
+                value=val,
+                inline=False
+            )
 
-    def get_destination(self):
+    @property
+    def destination(self):
         ctx = self.context
         if self.dm_help is True:
             return ctx.author
         else:
             return ctx.channel
+
+    async def send_embed(self):
+        """A helper utility to send the page output from :attr:`embed` to the destination."""
+        await self.destination.send(embed=self.embed)
 
     async def prepare_help_command(self, ctx, command=None):
         self.embed = discord.Embed(colour=Colour.green())
@@ -87,7 +95,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         filtered = await self.filter_commands(bot.commands, sort=self.sort_commands)
         self.add_commands(filtered, heading=self.commands_heading)
 
-        note = self.get_ending_note()
+        note = self.ending_note
         if note:
             self.embed = self.embed.add_field(name='Note', value=note, inline=True)
 
