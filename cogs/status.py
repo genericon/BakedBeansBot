@@ -54,7 +54,8 @@ class StatusCog(commands.Cog):
             status = discord.CustomActivity(name=r['name'], emoji=emoji)
 
         await self.bot.change_presence(activity=status)
-        logging.info(f'Set Status to: "{status.emoji.name}" "{status.name}"!')
+        emoji_name = status.emoji.name if status.emoji is not None else ''
+        logging.info(f'Set Status to: "{emoji_name}" "{status.name}"!')
         await ctx.send(f'Status: "{status.emoji}" "{status.name}"!')
 
     @commands.command()
