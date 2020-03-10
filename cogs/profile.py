@@ -13,7 +13,13 @@ import typing
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.services = ['MyAnimeList', 'AniList', 'VNDB', 'MyFigureCollection']
+        self.services = {
+            'MyAnimeList': (lambda u: f"https://myanimelist.net/profile/{url_quote(u)}"),
+            'AniList': (lambda u: f"https://anilist.co/user/{url_quote(u)}/"),
+            'GitHub': (lambda u: f"https://github.com/{url_quote(u)}"),
+            'VNDB': (lambda u: f"https://vndb.org/{url_quote(u)}"),
+            'MyFigureCollection': (lambda u: f"https://myfigurecollection.net/profile/{url_quote(u)}")
+        }
 
     @commands.command()
     async def profile(self, ctx, user: typing.Optional[discord.User]):
@@ -31,7 +37,9 @@ class ProfileCog(commands.Cog):
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                 results = await conn.fetch('''
-                    SELECT service, username
+                    SELECT
+                    (each(data)).key as service,
+                    (each(data)).value as username
                     FROM profile_data
                     WHERE uid = $1
                     ORDER BY service DESC
@@ -41,22 +49,15 @@ class ProfileCog(commands.Cog):
             service, username = rec['service'], rec['username']
             logging.debug(f'"{user.id}" "{service}" "{username}"')
 
-            if service == 'MyAnimeList':
-                link = f"https://myanimelist.net/profile/{url_quote(username)}"
-            elif service == 'AniList':
-                link = f"https://anilist.co/user/{url_quote(username)}/"
-            elif service == 'VNDB':
-                link = f"https://vndb.org/{url_quote(username)}"
-            elif service == 'MyFigureCollection':
-                link = f"https://myfigurecollection.net/profile/{url_quote(username)}"
-
-            value = f"[{escape_markdown(username)}]({link})"
-
-            embed = embed.add_field(
-                name=service,
-                value=value,
-                inline=True
-            )
+            func = self.services.get(service)
+            if func is not None:
+                link = func(username)
+                value = f"[{escape_markdown(username)}]({link})"
+                embed = embed.add_field(
+                    name=service,
+                    value=value,
+                    inline=True
+                )
 
         await ctx.send(embed=embed)
 
@@ -72,11 +73,11 @@ class ProfileCog(commands.Cog):
             async with conn.transaction():
                 await conn.execute('''
                     INSERT INTO profile_data
-                    (uid, service, username)
-                    VALUES ($1, $2, $3)
-                    ON CONFLICT (uid, service)
+                    (uid, data)
+                    VALUES ($1, hstore($2, $3))
+                    ON CONFLICT (uid)
                     DO UPDATE
-                    SET username = EXCLUDED.username
+                    SET data = profile_data.data || EXCLUDED.data
                 ''', user.id, service, username)
 
         logging.info(f'Set Service "{service}" to username "{username}" for "{user.id}"')
@@ -92,8 +93,9 @@ class ProfileCog(commands.Cog):
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                 await conn.execute('''
-                    DELETE FROM profile_data
-                    WHERE uid = $1 AND service = $2
+                    UPDATE profile_data
+                    SET data = delete(data, $2)
+                    WHERE uid = $1
                 ''', user.id, service)
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')

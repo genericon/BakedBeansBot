@@ -1,9 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS hstore;
+
 CREATE TABLE IF NOT EXISTS profile_data (
-    uid NUMERIC NOT NULL,
-    service TEXT NOT NULL,
-    username TEXT NOT NULL,
-    PRIMARY KEY (uid, service)
+    uid NUMERIC NOT NULL PRIMARY KEY,
+    data hstore DEFAULT ''::hstore NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_profile_data_uid 
-ON profile_data(uid);
