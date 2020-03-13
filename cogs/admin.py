@@ -1,7 +1,6 @@
+import asyncio
 import discord
 from discord.ext import commands
-
-import asyncio
 
 
 class AdminCog(commands.Cog):
@@ -14,8 +13,11 @@ class AdminCog(commands.Cog):
         """
         Delete DM's from this Bot
         """
-        await asyncio.gather(
-            *(msg.delete() for msg in filter(lambda m: m.channel is ctx.channel, msgs))
+        await asyncio.wait(
+            list(map(
+                lambda msg: msg.delete(),
+                filter(lambda m: m.channel is ctx.channel, msgs)
+            ))
         )
 
 

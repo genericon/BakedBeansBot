@@ -1,5 +1,4 @@
 import discord
-from discord import Colour
 from discord.ext import commands
 
 
@@ -26,7 +25,9 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.dm_help = options.pop('dm_help', False)
         self.commands_heading = options.pop('commands_heading', "Commands:")
 
-        self.embed = discord.Embed(colour=Colour.green())
+        self.embed_colour = discord.Colour.green()
+
+        self.embed = discord.Embed(colour=self.embed_colour)
 
         super().__init__(**options)
 
@@ -82,7 +83,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.destination.send(embed=self.embed)
 
     async def prepare_help_command(self, ctx, command=None):
-        self.embed = discord.Embed(colour=Colour.green())
+        self.embed = discord.Embed(colour=self.embed_colour)
         await super().prepare_help_command(ctx, command)
 
     async def send_bot_help(self, mapping):
