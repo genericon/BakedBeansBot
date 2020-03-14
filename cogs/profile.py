@@ -123,15 +123,6 @@ class ProfileCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
     """
 
-    """
-    @commands.command()
-    async def profile_import_channel(self, ctx):
-        # Loop through every message in #mal-anilist-vndb-etc-share
-        # for initial data migration
-        # This is going to be 'fun'
-        return
-    """
-
 
 def setup(bot):
     bot.add_cog(ProfileCog(bot))
