@@ -6,15 +6,16 @@ import functools
 import operator
 import typing
 
-
-async def is_rsfa(ctx):
-    return ctx.guild and ctx.guild.id == ctx.bot.config['server']
-
-
 class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @classmethod
+    async def is_rsfa(cls, ctx):
+        try:
+            return ctx.guild.id == ctx.bot.config['server']
+        except:
+            return False
 
     @commands.command()
     @commands.dm_only()
@@ -23,9 +24,9 @@ class RolesCog(commands.Cog):
         Change Role Color for Users
         """
 
-        server = self.bot.get_guild(self.bot.config['server'])
-        user = server.get_member(ctx.message.author.id)
-        highest_role = user.roles[-1]
+        guild = self.bot.get_guild(self.bot.config['server'])
+        member = guild.get_member(ctx.author.id)
+        highest_role = member.roles[-1]
         if colour is None:
             colour = Colour.default()
 
@@ -37,17 +38,16 @@ class RolesCog(commands.Cog):
 
 
     @commands.command()
-    @commands.check(is_rsfa)
+    @commands.guild_only()
+    @commands.check(self.is_rsfa)
     async def appoint(self, ctx, target_member: discord.Member, new_role: discord.Role):
         """Appoint User to a Role"""
-        server = self.bot.get_guild(self.bot.config['server'])
-        user = server.get_member(ctx.message.author.id)
-        appoint_roles = self.bot.config['appoint_roles']
+        member = ctx.author
 
-        is_admin = any(map(lambda r: r.permissions.administrator, user.roles))
+        if not member.guild_permissions.administrator:
+            appoint_roles = self.bot.config['appoint_roles']
 
-        if not is_admin:
-            appointable_roles = map(lambda r: appoint_roles.get(r.name, []), user.roles)
+            appointable_roles = map(lambda r: appoint_roles.get(r.name, []), member.roles)
             appointable_roles = functools.reduce(operator.iconcat, appointable_roles, [])
 
             if not any(map(lambda r: r.id == new_role.id, appointable_roles)):
@@ -55,7 +55,6 @@ class RolesCog(commands.Cog):
                 return
 
         await target_member.add_roles(new_role)
-
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
