@@ -47,6 +47,9 @@ class TwitchCog(commands.Bot):
         self.lock = asyncio.Lock()
         asyncio.create_task(self.twitch.connect())
 
+    def cog_unload(self):
+        asyncio.create_task(self.twitch.disconnect())
+
     @classmethod
     async def is_rsfa_admin(cls, ctx):
         try:
