@@ -60,7 +60,7 @@ class TwitchCog(commands.Bot):
             return False
 
     @commands.command(hidden=True)
-    @commands.check(self.is_rsfa_admin)
+    @commands.check(is_rsfa_admin)
     async def host(self, ctx, chan: str):
         self.twitch.host(chan)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
@@ -70,7 +70,6 @@ class TwitchCog(commands.Bot):
     async def unhost(self, ctx):
         self.twitch.unhost(chan)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
-
 
     @tasks.loop(minutes=15.0)
     async def host_update(self):

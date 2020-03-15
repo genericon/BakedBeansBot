@@ -49,9 +49,9 @@ class ProfileCog(commands.Cog):
             service, username = rec['service'], rec['username']
             logging.debug(f'"{user.id}" "{service}" "{username}"')
 
-            func = self.services.get(service)
-            if func is not None:
-                link = func(username)
+            formatter = self.services.get(service)
+            if formatter is not None:
+                link = formatter(username)
                 value = f"[{escape_markdown(username)}]({link})"
                 embed = embed.add_field(
                     name=service,
