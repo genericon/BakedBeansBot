@@ -39,7 +39,7 @@ class RolesCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.check(self.is_rsfa)
+    @commands.check(is_rsfa)
     async def appoint(self, ctx, target_member: discord.Member, new_role: discord.Role):
         """Appoint User to a Role"""
         member = ctx.author
