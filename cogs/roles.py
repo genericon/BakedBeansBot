@@ -6,16 +6,15 @@ import functools
 import operator
 import typing
 
+async def is_rsfa(ctx):
+    try:
+        return ctx.guild.id == ctx.bot.config['server']
+    except:
+        return False
+
 class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @classmethod
-    async def is_rsfa(cls, ctx):
-        try:
-            return ctx.guild.id == ctx.bot.config['server']
-        except:
-            return False
 
     @commands.command()
     @commands.dm_only()

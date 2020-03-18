@@ -5,6 +5,13 @@ import asyncio
 import pydle
 import typing
 
+async def is_rsfa_admin(ctx):
+    try:
+        guild = ctx.bot.get_guild(ctx.bot.config['server'])
+        member = guild.get_member(ctx.author.id)
+        return member.guild_permissions.administrator
+    except:
+        return False
 
 class TwitchBot(pydle.Client):
     def __init__(self):
@@ -55,15 +62,6 @@ class TwitchCog(commands.Cog):
     def cog_unload(self):
         asyncio.create_task(self.twitch.disconnect())
 
-    @classmethod
-    async def is_rsfa_admin(cls, ctx):
-        try:
-            guild = ctx.bot.get_guild(ctx.bot.config['server'])
-            member = guild.get_member(ctx.author.id)
-            return member.guild_permissions.administrator
-        except:
-            return False
-
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
     async def host(self, ctx, chan: str):
@@ -76,11 +74,13 @@ class TwitchCog(commands.Cog):
         self.twitch.unhost(chan)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
+    '''
     @tasks.loop(minutes=15.0)
     async def host_update(self):
         # self.twitch.host_target(self.host_chan, channel)
         # self.twitch.host_target(self.host_chan)
         pass
+    '''
 
 
 def setup(bot):
