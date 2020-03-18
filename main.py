@@ -114,5 +114,5 @@ class Bot(commands.Bot):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     loop = asyncio.get_event_loop()
-    loop.set_debug(True)
+    loop.set_debug(False)
     loop.run_until_complete(run())

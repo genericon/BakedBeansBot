@@ -77,15 +77,14 @@ class InstagramCog(commands.Cog):
     async def ig_broadcast(self, ctx, uname: str):
         logging.info(f'Getting Instagram broadcast info for "{uname}"')
         u_id = self.ig_api.username_info(uname)['user']['id']
-        logging.debug(f'"{uname}" corresponds to user id "{u_id}"')
-        b_id = self.ig_api.user_story_feed(u_id)['broadcast']
-        logging.debug(f'"{uname}" ({u_id}) is broadcasting ({b_id})')
-        b_info = self.ig_api.broadcast_info(b_id)
+        logging.info(f'"{uname}" corresponds to user id "{u_id}"')
+        b_info = self.ig_api.user_story_feed(u_id)['broadcast']
+        b_id = b_info['id']
+        logging.info(f'"{uname}" ({u_id}) is broadcasting ({b_id})')
+        logging.info(str(b_info))
         dash = b_info['dash_playback_url']
-        rtmp = b_info['rtmp_playback_url']
-        logging.debug(f'{b_id}: DASH - {dash}')
-        logging.debug(f'{b_id}: RTMP - {rtmp}')
-        await ctx.send(f"**DASH:** {dash}\n**RTMP:** {rtmp}")
+        logging.info(f'{b_id}: DASH - {dash}')
+        await ctx.send(f"**DASH:** `{dash}`")
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
