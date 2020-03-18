@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "34b7b8d61d7cf23abd9bb79082c4deb579b21c3ba5e1db42244eb2f87c8ccdc2"
+            "sha256": "3c030789a9ed779ba29af0627b08414fc8e071074d093e9bc97811ff1bad21b7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -94,6 +94,10 @@
                 "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"
             ],
             "version": "==2.9"
+        },
+        "instagram-private-api": {
+            "git": "https://git@github.com/ping/instagram_private_api.git",
+            "ref": "1d70e99bc11591161b0cd71cff3f0c08cd04b34f"
         },
         "multidict": {
             "hashes": [
