@@ -20,25 +20,46 @@ async def is_rsfa_admin(ctx):
 class InstagramCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ig_api = InstagramCog.ig_client_async(
-            username=os.environ.get('IG_USERNAME'),
-            password=os.environ.get('IG_PASSWORD'),
-            auto_patch=True
-        )
+        self.bot.loop.create_task(self.init_ig())
+
+    async def init_ig(self):
+        kwargs = {
+            'username': os.environ.get('IG_USERNAME'),
+            'password': os.environ.get('IG_PASSWORD'),
+            'auto_patch': True
+        }
+
+        ig_settings = self.bot.config.get('ig_settings')
+
+        if ig_settings is None:
+            self.ig_api = await InstagramCog.ig_client_async(**kwargs)
+        else:
+            try:
+                self.ig_api = await InstagramCog.ig_client_async(
+                    **kwargs,
+                    settings=ig_settings
+                )
+            except (ClientCookieExpiredError, ClientLoginRequiredError):
+                self.ig_api = await InstagramCog.ig_client_async(
+                    **kwargs,
+                    device_id=ig_settings['device_id']
+                )
+
+        logging.info('Logged into Instagram')
+        logging.info(str(self.ig_api.settings))
+
 
     @staticmethod
     def ig_client_async(*args, **kwargs):
         fut = asyncio.get_event_loop().create_future()
-        fut.add_done_callback(lambda x: logging.info(str(x)))
-        kwargs['on_login'] = lambda *a, **kw: fut.set_result((a, kw))
-        
-        ig_api = None
+        kwargs['on_login'] = lambda client: fut.set_result(client)
+
         try:
-            ig_api = IgClient(*args, **kwargs)
+            IgClient(*args, **kwargs)
         except Exception as e:
             fut.set_exception(e)
 
-        return ig_api
+        return fut
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
