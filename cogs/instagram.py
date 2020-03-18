@@ -8,6 +8,15 @@ from instagram_private_api import Client as IgClient
 
 # See https://github.com/ping/instagram_private_api
 
+async def is_rsfa_admin(ctx):
+    try:
+        guild = ctx.bot.get_guild(ctx.bot.config['server'])
+        member = guild.get_member(ctx.author.id)
+        return member.guild_permissions.administrator
+    except:
+        return False
+
+
 class InstagramCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -16,15 +25,6 @@ class InstagramCog(commands.Cog):
             password=os.environ.get('IG_PASSWORD'),
             auto_patch=True
         )
-
-    @classmethod
-    async def is_rsfa_admin(cls, ctx):
-        try:
-            guild = ctx.bot.get_guild(ctx.bot.config['server'])
-            member = guild.get_member(ctx.author.id)
-            return member.guild_permissions.administrator
-        except:
-            return False
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
