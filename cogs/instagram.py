@@ -5,6 +5,7 @@ import os
 import asyncio
 import logging
 import json
+from base64 import b64encode, b64decode
 from instagram_private_api import Client as IgClient
 
 # See https://github.com/ping/instagram_private_api
@@ -36,6 +37,7 @@ class InstagramCog(commands.Cog):
             self.ig_api = await InstagramCog.ig_client_async(**kwargs)
         else:
             try:
+                ig_settings['cookies'] = b64decode(ig_settings['cookies'].encode('utf-8'))
                 self.ig_api = await InstagramCog.ig_client_async(
                     **kwargs,
                     settings=ig_settings
@@ -47,7 +49,9 @@ class InstagramCog(commands.Cog):
                 )
 
         logging.info('Logged into Instagram')
-        logging.info(json.dumps(self.ig_api.settings))
+        ig_settings = self.ig_api.settings
+        ig_settings['cookies'] = b64encode(ig_settings['cookies']).decode('utf-8')
+        logging.info(json.dumps(ig_settings))
 
 
     @staticmethod
