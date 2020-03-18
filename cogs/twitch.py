@@ -3,6 +3,7 @@ from discord.ext import tasks, commands
 
 import asyncio
 import pydle
+import typing
 
 
 class TwitchBot(pydle.Client):
@@ -10,7 +11,6 @@ class TwitchBot(pydle.Client):
         super().__init__(
             nickname=os.getenv('TWITCH_BOT_NICK')
         )
-        self.twitch_chan = os.getenv('TWITCH_BOT_CHAN')
 
     async def connect(self):
         await super().connect(
@@ -25,26 +25,31 @@ class TwitchBot(pydle.Client):
         await super().on_connect()
         # await self.capreq(':twitch.tv/membership')
         # await self.capreq(':twitch.tv/tags')
-        # await self.capreq(':twitch.tv/commands')
+        await self.capreq(':twitch.tv/commands')
         # await self.join(f'#{self.twitch_chan}')
 
     async def capreq(self, message):
         await self.rawmsg('CAP REQ', message)
 
-    async def host(self, chan):
-        # await self.rawmsg('HOSTTARGET', f'#{self.twitch_chan}', f':{chan}')
-        await self.message(f'#{self.twitch_chan}', f'.host {chan}')
+    async def host_target(self, host_chan: str, chan: typing.Optional[str] = None, num_viewers: typing.Optional[int] = None):
+        # Based on https://dev.twitch.tv/docs/irc/commands#hosttarget-twitch-commands
 
-    async def unhost(self):
-        # await self.rawmsg('HOSTTARGET', f'#{self.twitch_chan}', ':-')
-        await self.message(f'#{self.twitch_chan}', '.unhost')
+        if chan is None:
+            chan = '-'
 
+        if num_viewers is None:
+            msg = chan
+        else:
+            msg = f'{chan} {num_viewers}'
+
+        await self.rawmsg('HOSTTARGET', f'#{self.host_chan}', msg)
 
 class TwitchCog(commands.Bot):
     def __init__(self, bot):
         self.bot = bot
         self.twitch = TwitchBot()
         self.lock = asyncio.Lock()
+        self.host_chan = os.getenv('TWITCH_BOT_CHAN')
         asyncio.create_task(self.twitch.connect())
 
     def cog_unload(self):
@@ -73,8 +78,8 @@ class TwitchCog(commands.Bot):
 
     @tasks.loop(minutes=15.0)
     async def host_update(self):
-        # self.twitch.host(channel)
-        # self.twitch.unhost()
+        # self.twitch.host_target(self.host_chan, channel)
+        # self.twitch.host_target(self.host_chan)
         pass
 
 
