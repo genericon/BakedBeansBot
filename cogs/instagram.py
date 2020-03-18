@@ -7,6 +7,7 @@ import logging
 import json
 from base64 import b64encode, b64decode
 from instagram_private_api import Client as IgClient
+from instagram_private_api import ClientCookieExpiredError, ClientLoginRequiredError
 
 # See https://github.com/ping/instagram_private_api
 
@@ -22,9 +23,9 @@ async def is_rsfa_admin(ctx):
 class InstagramCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.loop.create_task(self.init_ig())
+        self.init_ig()
 
-    async def init_ig(self):
+    def init_ig(self):
         kwargs = {
             'username': os.environ.get('IG_USERNAME'),
             'password': os.environ.get('IG_PASSWORD'),
@@ -34,28 +35,33 @@ class InstagramCog(commands.Cog):
         ig_settings = self.bot.config.get('ig_settings')
 
         if ig_settings is None:
-            self.ig_api = await InstagramCog.ig_client_async(**kwargs)
+            ig_api = InstagramCog.ig_client_sync(**kwargs)
         else:
             try:
-                ig_settings['cookies'] = b64decode(ig_settings['cookies'].encode('utf-8'))
-                self.ig_api = await InstagramCog.ig_client_async(
+                ig_settings['cookie'] = b64decode(ig_settings['cookie'].encode('utf-8'))
+                ig_api = InstagramCog.ig_client_sync(
                     **kwargs,
                     settings=ig_settings
                 )
             except (ClientCookieExpiredError, ClientLoginRequiredError):
-                self.ig_api = await InstagramCog.ig_client_async(
+                ig_api = InstagramCog.ig_client_sync(
                     **kwargs,
-                    device_id=ig_settings['device_id']
+                    device_id=ig_settings.get('device_id')
                 )
 
+        self.ig_api = ig_api
         logging.info('Logged into Instagram')
         ig_settings = self.ig_api.settings
-        ig_settings['cookies'] = b64encode(ig_settings['cookies']).decode('utf-8')
+        ig_settings['cookie'] = b64encode(ig_settings['cookie']).decode('utf-8')
         logging.info(json.dumps(ig_settings))
 
 
     @staticmethod
-    def ig_client_async(*args, **kwargs):
+    def ig_client_sync(*args, **kwargs):
+        return IgClient(*args, **kwargs)
+
+    @staticmethod
+    async def ig_client_async(*args, **kwargs):
         fut = asyncio.get_event_loop().create_future()
         kwargs['on_login'] = lambda client: fut.set_result(client)
 
@@ -64,7 +70,7 @@ class InstagramCog(commands.Cog):
         except Exception as e:
             fut.set_exception(e)
 
-        return fut
+        return (await fut)
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)

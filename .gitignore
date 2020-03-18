@@ -134,3 +134,6 @@ postgres-data
 
 # PyCharm (extra)
 .idea
+
+# Other
+config_secret.json

@@ -23,9 +23,12 @@ INITIAL_EXTENSIONS = [
 
 
 def config_load():
+    conf = {}
     with open('config.json', 'r', encoding='utf-8') as doc:
-        # Please make sure encoding is correct, especially after editing the config file
-        return json.load(doc)
+        conf = json.load(doc)
+    with open('config_secret.json', 'r', encoding='utf-8') as doc:
+        conf.update(json.load(doc))
+    return conf
 
 
 async def run():
@@ -111,4 +114,5 @@ class Bot(commands.Bot):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     loop = asyncio.get_event_loop()
+    loop.set_debug(True)
     loop.run_until_complete(run())
