@@ -71,7 +71,7 @@ class TwitchCog(commands.Bot):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     @commands.command(hidden=True)
-    @commands.check(self.is_rsfa_admin)
+    @commands.check(is_rsfa_admin)
     async def unhost(self, ctx):
         self.twitch.unhost(chan)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')

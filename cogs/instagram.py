@@ -41,7 +41,7 @@ class InstagramCog(commands.Bot):
         await ctx.send(f"**DASH:** {dash}\n**RTMP:** {rtmp}")
 
     @commands.command(hidden=True)
-    @commands.check(self.is_rsfa_admin)
+    @commands.check(is_rsfa_admin)
     async def ig_follow(self, ctx, uname: str):
         logging.info(f'Following "{uname}" on Instagram')
         u_id = self.ig_api.username_info(uname)['user']['id']
