@@ -3,16 +3,17 @@ from discord.ext import tasks, commands
 
 import os
 import asyncio
+import logging
 from instagram_private_api import Client as IgClient
 
 # See https://github.com/ping/instagram_private_api
 
-class InstagramCog(commands.Bot):
+class InstagramCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ig_api = IgClient(
-            os.environ.get('IG_USERNAME'),
-            os.environ.get('IG_PASSWORD'),
+            username=os.environ.get('IG_USERNAME'),
+            password=os.environ.get('IG_PASSWORD'),
             auto_patch=True
         )
 

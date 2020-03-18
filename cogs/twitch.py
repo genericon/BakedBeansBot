@@ -44,7 +44,7 @@ class TwitchBot(pydle.Client):
 
         await self.rawmsg('HOSTTARGET', f'#{self.host_chan}', msg)
 
-class TwitchCog(commands.Bot):
+class TwitchCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.twitch = TwitchBot()

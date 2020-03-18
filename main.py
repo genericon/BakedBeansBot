@@ -53,14 +53,16 @@ class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(
             command_prefix=('bbb.',),
-            description=kwargs['description']
+            description=kwargs.get('description')
         )
         self.start_time = None
         self.app_info = None
 
-        self.db = kwargs['db']
+        self.environ = kwargs.get('environ')
 
-        self.config = kwargs['config']
+        self.db = kwargs.get('db')
+
+        self.config = kwargs.get('config')
 
         self.loop.create_task(self.track_start())
 
