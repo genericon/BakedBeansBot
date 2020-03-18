@@ -4,6 +4,7 @@ from discord.ext import tasks, commands
 import os
 import asyncio
 import logging
+import json
 from instagram_private_api import Client as IgClient
 
 # See https://github.com/ping/instagram_private_api
@@ -46,7 +47,7 @@ class InstagramCog(commands.Cog):
                 )
 
         logging.info('Logged into Instagram')
-        logging.info(str(self.ig_api.settings))
+        logging.info(json.dumps(self.ig_api.settings))
 
 
     @staticmethod
