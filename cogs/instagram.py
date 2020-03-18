@@ -20,11 +20,23 @@ async def is_rsfa_admin(ctx):
 class InstagramCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ig_api = IgClient(
+        self.ig_api = await InstagramCog.ig_client_async(
             username=os.environ.get('IG_USERNAME'),
             password=os.environ.get('IG_PASSWORD'),
             auto_patch=True
         )
+
+    @staticmethod
+    async def ig_client_async(*args, **kwargs):
+        fut = asyncio.get_event_loop().create_future()
+        kwargs['on_login'] = lambda *a, **kw: fut.set_result((a, kw))
+        ig_api = None
+        try:
+            ig_api = IgClient(*args, **kwargs)
+        except Exception as e:
+            fut.set_exception(e)
+        logging.info(str(await fut))
+        return ig_api
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
