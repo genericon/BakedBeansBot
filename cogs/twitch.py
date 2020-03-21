@@ -40,10 +40,9 @@ class TwitchBot(pydle.Client):
 
     async def raid_target(self, host_chan: str, chan: typing.Optional[str] = None):
         if chan is None:
-            await self.rawmsg('.unraid')
+            await self.message(f'#{self.twitch_chan}', '.unraid')
         else:
-            await self.rawmsg('.raid', chan)
-
+            await self.message(f'#{self.twitch_chan}', f'.raid {chan}')
     '''
     async def host_target(self, host_chan: str, chan: typing.Optional[str] = None, num_viewers: typing.Optional[int] = None):
         # Based on https://dev.twitch.tv/docs/irc/commands#hosttarget-twitch-commands
