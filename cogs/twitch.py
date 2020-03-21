@@ -1,6 +1,7 @@
 import discord
 from discord.ext import tasks, commands
 
+import os
 import asyncio
 import pydle
 import typing
@@ -13,11 +14,19 @@ async def is_rsfa_admin(ctx):
     except:
         return False
 
-class TwitchBot(pydle.Client):
+
+class TwitchBot(pydle.featurize(
+		pydle.features.RFC1459Support,
+		pydle.features.IRCv3Support,
+		pydle.features.ircv3.CapabilityNegotiationSupport
+		)):
     def __init__(self):
+        nickname = os.getenv('TWITCH_BOT_NICK')
         super().__init__(
-            nickname=os.getenv('TWITCH_BOT_NICK')
+            nickname=nickname,
+            realname='BakedBeansBot'
         )
+        self.twitch_chan = f'#{nickname}'
 
     async def connect(self):
         await super().connect(
@@ -33,16 +42,28 @@ class TwitchBot(pydle.Client):
         # await self.capreq(':twitch.tv/membership')
         # await self.capreq(':twitch.tv/tags')
         # await self.capreq(':twitch.tv/commands')
-        await self.join(f'#{self.twitch_chan}')
+        await self.join(self.twitch_chan)
+
+    def on_raw_004(self, msg):
+        """
+        Twitch IRC does not match what the pydle library expects
+        which causes Pydle to raise exceptions.
+        Override on_raw_004 and prevent super call
+
+        Copied from:
+        https://github.com/LangridgeDaniel/python-twitch-irc/blob/master/python_twitch_irc/irc.py
+        """
+        logging.debug(f'on_raw_004: {msg}')
 
     async def capreq(self, message):
         await self.rawmsg('CAP REQ', message)
 
     async def raid_target(self, host_chan: str, chan: typing.Optional[str] = None):
         if chan is None:
-            await self.message(f'#{self.twitch_chan}', '.unraid')
+            await self.message(self.twitch_chan, '.unraid')
         else:
-            await self.message(f'#{self.twitch_chan}', f'.raid {chan}')
+            await self.message(self.twitch_chan, f'.raid {chan}')
+
     '''
     async def host_target(self, host_chan: str, chan: typing.Optional[str] = None, num_viewers: typing.Optional[int] = None):
         # Based on https://dev.twitch.tv/docs/irc/commands#hosttarget-twitch-commands
