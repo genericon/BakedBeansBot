@@ -18,7 +18,7 @@ INITIAL_EXTENSIONS = [
     'cogs.roles',
     'cogs.profile',
     'cogs.events',
-    'cogs.instagram'
+    'cogs.twitch'
 ]
 
 

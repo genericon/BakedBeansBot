@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "22c257a0e86f13dd420d87da1bf614c4afbb7fd914c47d28d91c4e4453d2ab3d"
+            "sha256": "63cd16e0fa63d7215c463f082b4c0dd5c18b546eb42ffc93342a7fbf76535b47"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -95,11 +95,6 @@
             ],
             "version": "==2.9"
         },
-        "instagram-private-api": {
-            "editable": true,
-            "git": "https://git@github.com/ping/instagram_private_api.git",
-            "ref": "1d70e99bc11591161b0cd71cff3f0c08cd04b34f"
-        },
         "multidict": {
             "hashes": [
                 "sha256:317f96bc0950d249e96d8d29ab556d01dd38888fbe68324f46fd834b430169f1",
@@ -121,6 +116,13 @@
                 "sha256:fc3b4adc2ee8474cb3cd2a155305d5f8eda0a9c91320f83e55748e1fcb68f8e3"
             ],
             "version": "==4.7.5"
+        },
+        "pydle": {
+            "hashes": [
+                "sha256:b2d40b76f3f98c49f4ca0753af9cf672d758843455359d27875f70e18facf4c9"
+            ],
+            "index": "pypi",
+            "version": "==0.9.3"
         },
         "websockets": {
             "hashes": [

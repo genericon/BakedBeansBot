@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 discord-py = "*"
 asyncpg = "*"
-instagram-private-api = {editable = true,git = "https://git@github.com/ping/instagram_private_api.git",ref = "1.6.0"}
+pydle = "*"
 
 [requires]
 python_version = "3.8"
