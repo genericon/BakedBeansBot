@@ -32,12 +32,19 @@ class TwitchBot(pydle.Client):
         await super().on_connect()
         # await self.capreq(':twitch.tv/membership')
         # await self.capreq(':twitch.tv/tags')
-        await self.capreq(':twitch.tv/commands')
-        # await self.join(f'#{self.twitch_chan}')
+        # await self.capreq(':twitch.tv/commands')
+        await self.join(f'#{self.twitch_chan}')
 
     async def capreq(self, message):
         await self.rawmsg('CAP REQ', message)
 
+    async def raid_target(self, host_chan: str, chan: typing.Optional[str] = None):
+        if chan is None:
+            await self.rawmsg('.unraid')
+        else:
+            await self.rawmsg('.raid', chan)
+
+    '''
     async def host_target(self, host_chan: str, chan: typing.Optional[str] = None, num_viewers: typing.Optional[int] = None):
         # Based on https://dev.twitch.tv/docs/irc/commands#hosttarget-twitch-commands
 
@@ -50,6 +57,8 @@ class TwitchBot(pydle.Client):
             msg = f'{chan} {num_viewers}'
 
         await self.rawmsg('HOSTTARGET', f'#{self.host_chan}', msg)
+    '''
+
 
 class TwitchCog(commands.Cog):
     def __init__(self, bot):
@@ -64,14 +73,14 @@ class TwitchCog(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
-    async def host(self, ctx, chan: str):
-        self.twitch.host(chan)
+    async def raid(self, ctx, chan: str):
+        self.twitch.raid_target(chan)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     @commands.command(hidden=True)
     @commands.check(is_rsfa_admin)
-    async def unhost(self, ctx):
-        self.twitch.unhost(chan)
+    async def unraid(self, ctx):
+        self.twitch.raid_target(None)
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     '''
