@@ -4,4 +4,3 @@ CREATE TABLE IF NOT EXISTS profile_data (
     uid NUMERIC NOT NULL PRIMARY KEY,
     data hstore DEFAULT ''::hstore NOT NULL
 );
-
