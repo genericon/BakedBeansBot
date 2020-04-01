@@ -53,11 +53,11 @@ class BakaCog(commands.Cog):
                     WHERE server_id = $1
                 ''', ctx.guild.id)
 
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
-
         for member_info in params:
             member = ctx.guild.get_member(member_info['user_id'])
             member.edit(nick=member_info['nick'])
+
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
     @commands.command(hidden=True)
@@ -67,6 +67,8 @@ class BakaCog(commands.Cog):
     async def baka(self, ctx):
         for member in ctx.guild.members:
             member.edit(nick='Baka')
+
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
 def setup(bot):
