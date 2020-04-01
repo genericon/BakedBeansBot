@@ -113,7 +113,7 @@ class ElectionCog(commands.Cog):
             stage_enum = ElectionStage.NONE
 
         if stage_enum is not None:
-            self.e_state[ctx.guild.id].stage = stage_enum
+            self.e_state.stage = stage_enum
 
 
     @election.command(pass_context=True)
@@ -143,6 +143,23 @@ class ElectionCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @election.command(pass_context=True)
+    async def elect(self, ctx, member: discord.Member):
+        """
+        Set the election stage
+        """
+
+        if self.e_state.stage != ElectionStage.REVIEW:
+            # The nomination stage is over
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+            return
+
+        else:
+            self.e_state.stage = ElectionStage.NONE
+            self.e_state.winner = member.id
+            # TODO: Announce Winner
+            # TODO: Announce Winner
+
 
     @election.command(pass_context=True)
     async def vote(self, ctx, member: discord.Member):
@@ -155,8 +172,8 @@ class ElectionCog(commands.Cog):
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
         else:
-            # Send PM
-            # Dispatch separate command to get around bucket
+            # TODO: Send PM
+            # TODO: Dispatch separate command to get around bucket
 
 
 def setup(bot):
