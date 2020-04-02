@@ -25,7 +25,7 @@ INITIAL_EXTENSIONS = [
 def config_load():
     conf = {}
     with open('config.json', 'r', encoding='utf-8') as doc:
-        conf = json.load(doc)
+        conf.update(json.load(doc))
     with open('config_secret.json', 'r', encoding='utf-8') as doc:
         conf.update(json.load(doc))
     return conf

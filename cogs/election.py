@@ -35,7 +35,6 @@ class ElectionCog(commands.Cog):
             winner: None
         }
 
-
     @commands.group(pass_context=True)
     @commands.guild_only()
     @commands.check(is_rsfa)
@@ -158,22 +157,50 @@ class ElectionCog(commands.Cog):
             self.e_state.stage = ElectionStage.NONE
             self.e_state.winner = member.id
             # TODO: Announce Winner
-            # TODO: Announce Winner
-
 
     @election.command(pass_context=True)
-    async def vote(self, ctx, member: discord.Member):
+    async def vote(self, ctx):
         """
-        Set the election stage
+        Request Vote DM
         """
 
         if self.e_state.stage != ElectionStage.VOTING:
-            # The nomination stage is over
+            # The voting stage is over
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
         else:
-            # TODO: Send PM
-            # TODO: Dispatch separate command to get around bucket
+            self.bot.dispatch('vote_request', ctx.message)
+
+    @commands.Cog.listener()
+    async def on_vote_request(self, message):
+        # ctx = await self.bot.get_context(message)
+
+        if message.author.dm_channel is None:
+            message.author.create_dm()
+
+        channel = message.author.dm_channel
+
+        # TODO: Send DM Embed with Voting Options
+        # dm_message = channel.send()
+
+        def vote_check(reaction, user):
+            if reaction.message != dm_message:
+                return False
+            # TODO: Check if valid reaction for options
+            return True
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=vote_check)
+            # TODO: Locking
+            # TODO: Add vote to dict
+        except asyncio.TimeoutError:
+            await channel.send('Vote Request Expired')
+        else:
+            await channel.send('\N{THUMBS UP SIGN}')
+        finally:
+            await dm_message.delete()
+
+        return
 
 
 def setup(bot):
