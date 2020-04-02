@@ -3,8 +3,6 @@ from discord import Colour
 from discord.ext import commands
 
 import asyncio
-import functools
-import operator
 import typing
 
 from enum import Enum
@@ -23,17 +21,15 @@ async def is_rsfa(ctx):
     except:
         return False
 
-
 class ElectionCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.e_state = {
-            position: None,
-            stage: ElectionStage.NONE,
-            nominations: set(),
-            votes: set(),
-            winner: None
-        }
+        self.e_lock = asyncio.Lock()
+        self.e_stage = ElectionStage.NONE
+        self.e_pos = None
+        self.e_nom = set()
+        self.e_votes = dict()
+
 
     @commands.group(pass_context=True)
     @commands.guild_only()
@@ -50,28 +46,25 @@ class ElectionCog(commands.Cog):
         Start Election Nomination Stage
         """
 
-        if role.id not in ctx.bot.config['officer_roles'].values():
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        # if role.id not in ctx.bot.config['officer_roles'].values():
+        #     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        #     return
 
-        if role.guild.id != ctx.guild.id:
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        # if role.guild.id != ctx.guild.id:
+        #     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        if self.e_state.stage != ElectionStage.NONE:
-            # An election is currently going on
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        async with self.e_lock:
+            if self.e_stage != ElectionStage.NONE:
+                # An election is currently going on
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        self.e_state = {
-            position: role.id,
-            stage: ElectionStage.NOMINATION
-            nominations: set(),
-            votes: {},
-            winner: None
-        }
+            else:
+                self.e_stage = ElectionStage.NOMINATION
+                self.e_pos = role
+                self.e_nom.clear()
+                self.e_votes.clear()
 
-        await ctx.send(f'Election started for "{role.name}". Ready for nominations.')
+                await ctx.send(f'Election started for "{role.name}". Ready for nominations.')
 
 
     @election.command(pass_context=True)
@@ -80,16 +73,14 @@ class ElectionCog(commands.Cog):
         Nominate a member for current election
         """
 
-        # if role.id not in ctx.bot.config['officer_roles'].values():
-        #     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        async with self.e_lock:
+            if self.e_stage != ElectionStage.NOMINATION:
+                # The nomination stage is over
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        if self.e_state.stage != ElectionStage.NOMINATION:
-            # The nomination stage is over
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-
-        else:
-            self.e_state.nominations.add(member.id)
-            await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+            else:
+                self.e_nom.add(member.id)
+                await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
     @election.command(pass_context=True)
@@ -112,35 +103,33 @@ class ElectionCog(commands.Cog):
             stage_enum = ElectionStage.NONE
 
         if stage_enum is not None:
-            self.e_state.stage = stage_enum
+            async with self.e_lock:
+                self.e_stage = stage_enum
 
 
     @election.command(pass_context=True)
     async def review(self, ctx):
         """
-        Set the election stage
+        Review Results (supposed to be for admin officers)
         """
 
-        if self.e_state.stage != ElectionStage.REVIEW:
-            # The nomination stage is over
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        embed = None
 
-        embed = discord.Embed(
-            title='Election Review:',
-            description=self.bot.description,
-            colour=Colour.blue()
-        ).add_field(
-            name='Contributing',
-            value='Check out the source on [GitHub](https://github.com/genericon/BakedBeansBot)',
-            inline=False
-        ).add_field(
-            name='License',
-            value='BakedBeansBot is released under the MIT License',
-            inline=False
-        )
+        async with self.e_lock:
+            if self.e_stage != ElectionStage.REVIEW:
+                # The review stage is over
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        await ctx.send(embed=embed)
+            else:
+                # TODO: Fill embed with content
+                embed = discord.Embed(
+                    title='Election Review:',
+                    description=f'Results for "{self.e_pos.name}"',
+                    colour=Colour.blue()
+                )
+
+        if embed is not None:
+            await ctx.send(embed=embed)
 
     @election.command(pass_context=True)
     async def elect(self, ctx, member: discord.Member):
@@ -148,15 +137,15 @@ class ElectionCog(commands.Cog):
         Set the election stage
         """
 
-        if self.e_state.stage != ElectionStage.REVIEW:
-            # The nomination stage is over
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        async with self.e_lock:
+            if self.e_stage != ElectionStage.REVIEW:
+                # The nomination stage is over
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        else:
-            self.e_state.stage = ElectionStage.NONE
-            self.e_state.winner = member.id
-            # TODO: Announce Winner
+            else:
+                self.e_stage = ElectionStage.NONE
+                # winner = member.id
+                # TODO: Announce Winner
 
     @election.command(pass_context=True)
     async def vote(self, ctx):
@@ -164,12 +153,13 @@ class ElectionCog(commands.Cog):
         Request Vote DM
         """
 
-        if self.e_state.stage != ElectionStage.VOTING:
-            # The voting stage is over
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        async with self.e_lock:
+            if self.e_stage != ElectionStage.VOTING:
+                # The voting stage is over
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-        else:
-            self.bot.dispatch('vote_request', ctx.message)
+            else:
+                self.bot.dispatch('vote_request', ctx.message)
 
     @commands.Cog.listener()
     async def on_vote_request(self, message):
@@ -181,7 +171,9 @@ class ElectionCog(commands.Cog):
         channel = message.author.dm_channel
 
         # TODO: Send DM Embed with Voting Options
-        # dm_message = channel.send()
+        # dm_message = await channel.send()
+
+        # TODO: Add reactions corresponding to options
 
         def vote_check(reaction, user):
             if reaction.message != dm_message:
@@ -191,16 +183,16 @@ class ElectionCog(commands.Cog):
 
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=vote_check)
-            # TODO: Locking
-            # TODO: Add vote to dict
+            async with self.e_lock:
+                if self.e_stage == ElectionStage.VOTING:
+                    await channel.send('\N{THUMBS UP SIGN}')
+                    # TODO: Add vote to dict
+                else:
+                    await channel.send('Voting is Over')
         except asyncio.TimeoutError:
             await channel.send('Vote Request Expired')
-        else:
-            await channel.send('\N{THUMBS UP SIGN}')
         finally:
             await dm_message.delete()
-
-        return
 
 
 def setup(bot):
