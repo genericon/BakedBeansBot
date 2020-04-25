@@ -6,13 +6,30 @@ import asyncio
 import typing
 
 from enum import Enum
+from enum import unique as enum_unique
 
+
+@enum_unique
 class ElectionStage(Enum):
-    NONE = 0
-    NOMINATION = 1
-    PRESENTATION = 2
-    VOTING = 3
-    REVIEW = 4
+    NONE = 'none'
+    NOMINATION = 'nomination'
+    PRESENTATION = 'presentation'
+    VOTING = 'voting'
+    REVIEW = 'review'
+
+
+class ElectionStageConverter(commands.Converter):
+    async def convert(self, ctx, argument: str):
+        stage = None
+
+        argument = argument.lower()
+
+        try:
+            stage = ElectionStage(argument)
+        except ValueError:
+            pass
+
+        return stage
 
 
 async def is_rsfa(ctx):
@@ -21,15 +38,49 @@ async def is_rsfa(ctx):
     except:
         return False
 
+async def is_rsfa_admin(ctx):
+    try:
+        guild = ctx.bot.get_guild(ctx.bot.config['server'])
+        member = guild.get_member(ctx.author.id)
+        return member.guild_permissions.administrator
+    except:
+        return False
+
+
 class ElectionCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.e_lock = asyncio.Lock()
         self.e_stage = ElectionStage.NONE
-        self.e_pos = None
+        self.e_pos = ''
         self.e_nom = set()
         self.e_votes = dict()
 
+
+    def _generate_emojis(self, options: int) -> List[str]:
+        _emojis = []
+
+        if options > 10:
+            for i in range(options):  # generates unicode emojis [A,B,C,…]
+                hex_str = hex(224 + (6 + i))[2:]
+                emoji = b'\\U0001f1a'.replace(b'a', bytes(hex_str, "utf-8"))
+                emoji = emoji.decode("unicode-escape")
+                _emojis.append(emoji)
+
+        else:
+            for i in range(options):  # generates unicode emojis [1,2,3,…]
+                if i < 9:
+                    emoji = 'x\u20e3'.replace('x', str(i + 1))
+                else:
+                    emoji = '\U0001f51f'
+
+                _emojis.append(emoji)
+
+        return _emojis
+
+    def _get_rsfa_member(self, uid: int):
+        guild = self.bot.get_guild(self.bot.config['server'])
+        return guild.get_member(uid)
 
     @commands.group(pass_context=True)
     @commands.guild_only()
@@ -41,7 +92,7 @@ class ElectionCog(commands.Cog):
 
 
     @election.command(pass_context=True)
-    async def start(self, ctx, role: discord.Role):
+    async def start(self, ctx, role: typing.Union[discord.Role, str]):
         """
         Start Election Nomination Stage
         """
@@ -64,7 +115,12 @@ class ElectionCog(commands.Cog):
                 self.e_nom.clear()
                 self.e_votes.clear()
 
-                await ctx.send(f'Election started for "{role.name}". Ready for nominations.')
+                if isinstance(self.e_pos, str):
+                    pos_name = self.e_pos
+                else:
+                    pos_name = self.e_pos.name
+
+                await ctx.send(f'Election started for "{pos_name}". Ready for nominations.')
 
 
     @election.command(pass_context=True)
@@ -84,23 +140,10 @@ class ElectionCog(commands.Cog):
 
 
     @election.command(pass_context=True)
-    async def stage(self, ctx, stage: str):
+    async def stage(self, ctx, stage: ElectionStageConverter):
         """
         Set the election stage
         """
-
-        stage_enum = None
-
-        if stage == 'nomination':
-            stage_enum = ElectionStage.NOMINATION
-        elif stage == 'presentation':
-            stage_enum = ElectionStage.PRESENTATION
-        elif stage == 'voting':
-            stage_enum = ElectionStage.VOTING
-        elif stage == 'review':
-            stage_enum = ElectionStage.REVIEW
-        elif stage == 'none':
-            stage_enum = ElectionStage.NONE
 
         if stage_enum is not None:
             async with self.e_lock:
@@ -108,6 +151,7 @@ class ElectionCog(commands.Cog):
 
 
     @election.command(pass_context=True)
+    @commands.check(is_rsfa_admin)
     async def review(self, ctx):
         """
         Review Results (supposed to be for admin officers)
@@ -122,15 +166,37 @@ class ElectionCog(commands.Cog):
 
             else:
                 # TODO: Fill embed with content
+                if isinstance(self.e_pos, str):
+                    pos_name = self.e_pos
+                else:
+                    pos_name = self.e_pos.name
+
+                vote_tally = {}
+
+                for choice in self.e_nom:
+                    vote_calc[choice] = []
+
+                for voter, choice in self.e_votes.items():
+                    vote_calc[choice].append(voter)
+
                 embed = discord.Embed(
-                    title='Election Review:',
-                    description=f'Results for "{self.e_pos.name}"',
+                    title='Election Review',
+                    description=f'Results for "{pos_name}"',
                     colour=Colour.blue()
                 )
+
+                for choice, votes in self.vote_tally.items():
+                    embed = embed.add_field(
+                        name=str(choice),
+                        value=len(votes),
+                        inline=False
+                    )
+
 
         if embed is not None:
             await ctx.send(embed=embed)
 
+'''
     @election.command(pass_context=True)
     async def elect(self, ctx, member: discord.Member):
         """
@@ -146,6 +212,7 @@ class ElectionCog(commands.Cog):
                 self.e_stage = ElectionStage.NONE
                 # winner = member.id
                 # TODO: Announce Winner
+'''
 
     @election.command(pass_context=True)
     async def vote(self, ctx):
@@ -170,23 +237,44 @@ class ElectionCog(commands.Cog):
 
         channel = message.author.dm_channel
 
-        # TODO: Send DM Embed with Voting Options
-        # dm_message = await channel.send()
+        choices = {}
 
-        # TODO: Add reactions corresponding to options
+        async with self.e_lock:
+            if isinstance(self.e_pos, str):
+                pos_name = self.e_pos
+            else:
+                pos_name = self.e_pos.name
 
-        def vote_check(reaction, user):
+            embed = discord.Embed(
+                title='Vote',
+                description=f'Ballot for "{pos_name}"',
+                colour=Colour.blue()
+            )
+
+            emojis = _generate_emojis(len(self.e_nom))
+            choices = dict(zip(emoji, self.e_nom))
+
+            for emoji, nom in choices.items():
+                choice_name = self._get_rsfa_member(nom).display_name
+                embed = embed.add_field(
+                    name=emoji,
+                    value=choice_name,
+                    inline=False
+                )
+
+        dm_message = await channel.send(embed=embed)
+
+        def vote_check(reaction):
             if reaction.message != dm_message:
                 return False
-            # TODO: Check if valid reaction for options
-            return True
+            return reaction.emoji in choices.keys()
 
         try:
-            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=vote_check)
+            reaction = await client.wait_for('reaction_add', timeout=60.0, check=vote_check)
             async with self.e_lock:
                 if self.e_stage == ElectionStage.VOTING:
                     await channel.send('\N{THUMBS UP SIGN}')
-                    # TODO: Add vote to dict
+                    self.e_votes[message.author.id] = choices[reaction.emoji]
                 else:
                     await channel.send('Voting is Over')
         except asyncio.TimeoutError:
