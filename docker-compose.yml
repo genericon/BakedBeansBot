@@ -24,6 +24,4 @@ services:
       PGDATABASE: "${POSTGRES_DB}"
       PGPASSWORD: "${POSTGRES_PASSWORD}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
-      TWITCH_BOT_NICK: "${TWITCH_BOT_NICK}"
-      TWITCH_BOT_PASSWORD: "${TWITCH_BOT_PASSWORD}"
     command: [ "wait-for-it", "db:5432", "--", "python", "./main.py" ]
