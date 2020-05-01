@@ -24,4 +24,4 @@ services:
       PGDATABASE: "${POSTGRES_DB}"
       PGPASSWORD: "${POSTGRES_PASSWORD}"
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
-    command: [ "wait-for-it", "db:5432", "--", "python", "./main.py" ]
+      WAIT_FOR_IT: "db:5432"

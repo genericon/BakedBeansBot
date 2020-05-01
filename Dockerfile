@@ -18,13 +18,9 @@ COPY Pipfile* ./
 # Install project dependencies
 RUN pipenv install --system --deploy
 
-# Install wait-for-it
-RUN apt-get update && apt-get install -y \
-    wait-for-it \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copy project files into working directory
 # This is done last to prevent unnecessary image rebuilds
 COPY . .
 
-CMD [ "python", "./main.py" ]
+ENTRYPOINT ["python"]
+CMD ["-m", "bakedbeans"]

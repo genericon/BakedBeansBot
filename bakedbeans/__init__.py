@@ -1,1 +1,1 @@
-from .bot import BakedBeansBot
+#from .bot import BakedBeansBot

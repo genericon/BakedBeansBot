@@ -14,5 +14,6 @@ pydle = "*"
 python_version = "3.8"
 
 [scripts]
+start = "python -m bakedbeans"
 build = "docker-compose build"
 deploy = "docker-compose up"
