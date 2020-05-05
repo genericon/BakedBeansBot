@@ -1,4 +1,5 @@
 import discord
+from discord import Colour
 from discord.ext import commands
 from discord.utils import escape_markdown
 
@@ -9,27 +10,60 @@ import typing
 
 # import tempfile
 
+PROFILE_SERVICES = {
+    'MyAnimeList': ("https://myanimelist.net/", (lambda u: f"https://myanimelist.net/profile/{url_quote(u)}")),
+    'AniList': ("https://anilist.co/", (lambda u: f"https://anilist.co/user/{url_quote(u)}/")),
+    'GitHub': ("https://github.com/", (lambda u: f"https://github.com/{url_quote(u)}")),
+    'VNDB': ("https://vndb.org/", (lambda u: f"https://vndb.org/{url_quote(u)}")),
+    'MyFigureCollection': ("https://myfigurecollection.net/", (lambda u: f"https://myfigurecollection.net/profile/{url_quote(u)}"))
+}
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.services = {
-            'MyAnimeList': (lambda u: f"https://myanimelist.net/profile/{url_quote(u)}"),
-            'AniList': (lambda u: f"https://anilist.co/user/{url_quote(u)}/"),
-            'GitHub': (lambda u: f"https://github.com/{url_quote(u)}"),
-            'VNDB': (lambda u: f"https://vndb.org/{url_quote(u)}"),
-            'MyFigureCollection': (lambda u: f"https://myfigurecollection.net/profile/{url_quote(u)}")
-        }
 
-    @commands.command()
-    async def profile(self, ctx, user: typing.Optional[discord.User]):
+    @commands.group(pass_context=True)
+    async def profile(self, ctx):
+        """
+        Manage Profile
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid profile command passed...')
+
+    @profile.command(name='services')
+    async def profile_services(self, ctx):
+        """
+        View supported services
+        """
+
+        embed = discord.Embed(
+            title='Services',
+            colour=Colour.blue()
+        )
+
+        for service, entry in PROFILE_SERVICES.items():
+            link = entry[0]
+            value = f"[{escape_markdown(service)}]({link})"
+            embed = embed.add_field(
+                value=value,
+                inline=True
+            )
+
+        await ctx.send(embed=embed)
+
+    @profile.command(name='view')
+    async def profile_view(self, ctx, user: typing.Optional[discord.User]):
+        """
+        Displays user profile
+        """
+
         if user is None:
             user = ctx.message.author
 
         embed = discord.Embed(
             title='Profile',
             description=user.name,
-            colour=discord.Colour.blue()
+            colour=Colour.blue()
         )
 
         logging.info(f'Getting profile data for "{user.id}"')
@@ -49,7 +83,7 @@ class ProfileCog(commands.Cog):
             service, username = rec['service'], rec['username']
             logging.debug(f'"{user.id}" "{service}" "{username}"')
 
-            formatter = self.services.get(service)
+            formatter = PROFILE_SERVICES.get(service)[1]
             if formatter is not None:
                 link = formatter(username)
                 value = f"[{escape_markdown(username)}]({link})"
@@ -61,12 +95,16 @@ class ProfileCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def profile_set(self, ctx, user: typing.Optional[discord.User], service: str, username: str):
+    @profile.command(name='add')
+    async def profile_add(self, ctx, user: typing.Optional[discord.User], service: str, username: str):
+        """
+        Add a service to your profile
+        """
+
         if user is None:
             user = ctx.message.author
 
-        if service not in self.services:
+        if service not in PROFILE_SERVICES:
             return
 
         async with self.bot.db.acquire() as conn:
@@ -85,8 +123,11 @@ class ProfileCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
-    @commands.command()
-    async def profile_del(self, ctx, user: typing.Optional[discord.User], service: str):
+    @profile.command(name='rm')
+    async def profile_rm(self, ctx, user: typing.Optional[discord.User], service: str):
+        """
+        Remove a service to your profile
+        """
         if user is None:
             user = ctx.message.author
 
@@ -101,7 +142,7 @@ class ProfileCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     """
-    @commands.command()
+    @profile.command(name='export')
     async def profile_export(self, ctx):
         with tempfile.TemporaryFile() as fp:
             async with self.bot.db.acquire() as conn:
@@ -112,7 +153,7 @@ class ProfileCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
-    @commands.command()
+    @profile.command(name='import')
     async def profile_import(self, ctx):
         attached = ctx.message.attachments[0]
         with tempfile.TemporaryFile() as fp:
