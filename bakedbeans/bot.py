@@ -19,6 +19,7 @@ class BakedBeansBot(commands.Bot):
         self._extensions = [
             'bakedbeans.cogs.help',
             'bakedbeans.cogs.admin',
+            'bakedbeans.cogs.bas',
             'bakedbeans.cogs.general',
             'bakedbeans.cogs.mention',
             'bakedbeans.cogs.poke',
