@@ -106,6 +106,19 @@ class EmbedHelpCommand(commands.HelpCommand):
         self.add_commands([command], heading='')
         await self.send_embed()
 
+    async def send_group_help(self, group):
+        ctx = self.context
+        bot = ctx.bot
+
+        filtered = await self.filter_commands(group.commands, sort=self.sort_commands)
+        self.add_commands(filtered, heading=self.commands_heading)
+
+        note = self.ending_note
+        if note:
+            self.embed = self.embed.add_field(name='Note', value=note, inline=True)
+
+        await self.send_embed()
+
 
 class EmbedHelpCog(commands.Cog):
     def __init__(self, bot):
