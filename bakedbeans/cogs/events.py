@@ -9,8 +9,16 @@ class EventsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def events(self, ctx, user: typing.Optional[discord.User]):
+    @commands.group(hidden=True, pass_context=True)
+    async def events(self, ctx):
+        """
+        Manage Events
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid events command passed...')
+
+    @events.command(name='view')
+    async def events_view(self, ctx, user: typing.Optional[discord.User]):
         if user is None:
             user = ctx.message.author
 
@@ -53,8 +61,8 @@ class EventsCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def event_create(self, ctx, event: str):
+    @events.command(name='create')
+    async def events_create(self, ctx, event: str):
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
                 await conn.execute('''
@@ -68,8 +76,8 @@ class EventsCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     """
-    @commands.command()
-    async def event_add_user(self, ctx, user: typing.Optional[discord.User], service: str):
+    @events.command(name='add_user')
+    async def events_add_user(self, ctx, user: typing.Optional[discord.User], service: str):
         if user is None:
             user = ctx.message.author
 
@@ -88,8 +96,8 @@ class EventsCog(commands.Cog):
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
-    @commands.command()
-    async def event_remove_user(self, ctx, user: typing.Optional[discord.User], service: str):
+    @events.command(name='rm_user')
+    async def events_rm_user(self, ctx, user: typing.Optional[discord.User], service: str):
         if user is None:
             user = ctx.message.author
 
@@ -110,8 +118,8 @@ class EventsCog(commands.Cog):
     """
 
     """
-    @commands.command()
     @commands.dm_only()
+    @events.command(name='import_server')
     async def events_import_server(self, ctx, server_id: int):
         # Import all server roles into the db
         # Filter through them manually later
