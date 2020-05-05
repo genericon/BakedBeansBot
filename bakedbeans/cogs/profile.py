@@ -42,11 +42,9 @@ class ProfileCog(commands.Cog):
         )
 
         for service, entry in PROFILE_SERVICES.items():
-            link = entry[0]
-            value = f"[{escape_markdown(service)}]({link})"
             embed = embed.add_field(
-                value=value,
-                inline=True
+                name=service,
+                value=entry[0]
             )
 
         await ctx.send(embed=embed)
