@@ -64,7 +64,7 @@ class EmbedHelpCommand(commands.HelpCommand):
                 if len(command.aliases) != 0:
                     val += f'\n*Aliases:* {", ".join(command.aliases)}'
 
-            self.embed = self.embed.add_field(
+            self.embed.add_field(
                 name=command.name,
                 value=val,
                 inline=False
@@ -98,7 +98,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         note = self.ending_note
         if note:
-            self.embed = self.embed.add_field(name='Note', value=note, inline=True)
+            self.embed.set_footer(text=note)
 
         await self.send_embed()
 
@@ -115,7 +115,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
         note = self.ending_note
         if note:
-            self.embed = self.embed.add_field(name='Note', value=note, inline=True)
+            self.embed.set_footer(text=note)
 
         await self.send_embed()
 
