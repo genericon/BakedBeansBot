@@ -14,8 +14,9 @@ PROFILE_SERVICES = {
     'MyAnimeList': ("https://myanimelist.net/", (lambda u: f"https://myanimelist.net/profile/{url_quote(u)}")),
     'AniList': ("https://anilist.co/", (lambda u: f"https://anilist.co/user/{url_quote(u)}/")),
     'GitHub': ("https://github.com/", (lambda u: f"https://github.com/{url_quote(u)}")),
-    'VNDB': ("https://vndb.org/", (lambda u: f"https://vndb.org/{url_quote(u)}")),
-    'MyFigureCollection': ("https://myfigurecollection.net/", (lambda u: f"https://myfigurecollection.net/profile/{url_quote(u)}"))
+    'VNDB': ("https://vndb.org/", (lambda u: f"https://vndb.org/u{url_quote(u)}")),
+    'MyFigureCollection': ("https://myfigurecollection.net/", (lambda u: f"https://myfigurecollection.net/profile/{url_quote(u)}")),
+    'Kitsu': ("https://kitsu.io/", (lambda u: f"https://kitsu.io/users/{url_quote(u)}"))
 }
 
 class ProfileCog(commands.Cog):
