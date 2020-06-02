@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  db:
+    # using host db
+    image: hello-world
+    command: hello
+    restart: 'no'
+
+  bot:
+    network_mode: "bridge"
+    extra_hosts:
+      - "db:172.17.0.1"
