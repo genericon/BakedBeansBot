@@ -14,6 +14,9 @@ class PokeCog(commands.Cog):
 
     @commands.command()
     async def poke(self, ctx):
+        """
+        Poke the bot
+        """
         await ctx.send(f'Hai, {self.bot.user.mention} Desu')
 
 
