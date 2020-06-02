@@ -4,7 +4,6 @@ services:
   db:
     # using host db
     image: hello-world
-    command: hello
     restart: 'no'
 
   bot:
