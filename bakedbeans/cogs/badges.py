@@ -141,7 +141,7 @@ class BadgeCog(commands.Cog):
 
                 for badge in badge_list:
                     role = server.get_role(badge['role_id'])
-                    if badge['name'] == role.name:
+                    if badge['name'] != role.name:
                         await conn.execute('''
                             UPDATE badge
                             SET name = $2
