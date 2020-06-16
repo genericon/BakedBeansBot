@@ -65,6 +65,7 @@ class BadgeCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @badges.command(name='pull')
+    @commands.has_guild_permissions(administrator=True)
     async def badge_pull(self, ctx, user: typing.Optional[discord.User]):
         """
         Pull Badge Data from DB and assign appropiate roles
@@ -94,6 +95,7 @@ class BadgeCog(commands.Cog):
         user.add_roles(*roles)
 
     @badges.command(name='create')
+    @commands.has_guild_permissions(administrator=True)
     async def badge_create(self, ctx, badge: typing.Union[discord.Role, str]):
         """
         Create New Badge
@@ -120,6 +122,7 @@ class BadgeCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
     @badges.command(name='push')
+    @commands.has_guild_permissions(administrator=True)
     async def badge_push(self, ctx):
         """
         Push Badge Data to DB
