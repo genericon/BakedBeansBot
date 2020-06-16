@@ -26,7 +26,7 @@ class BakedBeansBot(commands.Bot):
             'bakedbeans.cogs.status',
             'bakedbeans.cogs.roles',
             'bakedbeans.cogs.profile',
-            'bakedbeans.cogs.events'
+            'bakedbeans.cogs.badges'
         ]
         self.load_extensions()
 
