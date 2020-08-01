@@ -128,7 +128,7 @@ class ProfileCog(commands.Cog):
                 value="\n".join(badges)
             )
 
-        if embed.fields is discord.Embed.Empty:
+        if not embed.fields:
             embed.add_field(
                 name="No Data Available",
                 value="*Higurashi Sounds*"
