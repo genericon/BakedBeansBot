@@ -73,7 +73,7 @@ class ProfileCog(commands.Cog):
 
         async with self.bot.db.acquire() as conn:
             async with conn.transaction():
-                results = await conn.fetch('''
+                results1 = await conn.fetch('''
                     SELECT
                     (each(data)).key as service,
                     (each(data)).value as username
@@ -82,8 +82,27 @@ class ProfileCog(commands.Cog):
                     ORDER BY service DESC
                 ''', user.id)
 
+                results2 = await conn.fetch('''
+                    SELECT
+                    badge.name as badge_name,
+                    attendance.count as badge_count
+                    FROM badges
+                    INNER JOIN badge ON
+                    badges.badge_id = badge.id
+                    INNER JOIN (
+                        SELECT badge_id,
+                        COUNT(badge_id) as count
+                        FROM badges
+                        GROUP BY badge_id
+                    ) attendance USING (badge_id)
+                    WHERE
+                    badge.server_id = $1 AND
+                    badges.uid = $2
+                    ORDER BY badge.id ASC
+                ''', ctx.guild.id, user.id)
+
         accs = []
-        for rec in results:
+        for rec in results1:
             service, username = rec['service'], rec['username']
             logging.debug(f'"{user.id}" "{service}" "{username}"')
 
@@ -98,9 +117,13 @@ class ProfileCog(commands.Cog):
             value="\n".join(accs)
         )
 
+        badges = []
+        for rec in results2:
+            badges.append(f"{rec['badge_name']} *({rec['badge_count']})*")
+
         embed.add_field(
             name="Badges",
-            value="*Work In Progress*"
+            value="\n".join(badges)
         )
 
         embed.set_footer(text="Unstable Feature")
