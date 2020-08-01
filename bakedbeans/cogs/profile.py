@@ -111,20 +111,28 @@ class ProfileCog(commands.Cog):
                 link = formatter(username)
                 value = f"**{service}**: [{escape_markdown(username)}]({link})"
                 accs.append(value)
-        
-        embed.add_field(
-            name="Links",
-            value="\n".join(accs)
-        )
+
+        if not accs:
+            embed.add_field(
+                name="Links",
+                value="\n".join(accs)
+            )
 
         badges = []
         for rec in results2:
             badges.append(f"{rec['badge_name']} *({rec['badge_count']})*")
 
-        embed.add_field(
-            name="Badges",
-            value="\n".join(badges)
-        )
+        if not badges:
+            embed.add_field(
+                name="Badges",
+                value="\n".join(badges)
+            )
+
+        if embed.fields is discord.Embed.Empty:
+            embed.add_field(
+                name="No Data Available",
+                value="*Higurashi Sounds*"
+            )
 
         embed.set_footer(text="Unstable Feature")
 
