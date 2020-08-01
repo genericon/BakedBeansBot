@@ -112,7 +112,7 @@ class ProfileCog(commands.Cog):
                 value = f"**{service}**: [{escape_markdown(username)}]({link})"
                 accs.append(value)
 
-        if not accs:
+        if accs:
             embed.add_field(
                 name="Links",
                 value="\n".join(accs)
@@ -122,7 +122,7 @@ class ProfileCog(commands.Cog):
         for rec in results2:
             badges.append(f"{rec['badge_name']} *({rec['badge_count']})*")
 
-        if not badges:
+        if badges:
             embed.add_field(
                 name="Badges",
                 value="\n".join(badges)
