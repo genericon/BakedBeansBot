@@ -61,8 +61,12 @@ class ProfileCog(commands.Cog):
 
         embed = discord.Embed(
             title='Profile',
-            description=user.name,
             colour=Colour.blue()
+        )
+
+        embed.set_author(
+            name=f"{user.name}#{user.discriminator}",
+            icon_url=user.avatar_url
         )
 
         logging.info(f'Getting profile data for "{user.id}"')
@@ -78,6 +82,7 @@ class ProfileCog(commands.Cog):
                     ORDER BY service DESC
                 ''', user.id)
 
+        accs = []
         for rec in results:
             service, username = rec['service'], rec['username']
             logging.debug(f'"{user.id}" "{service}" "{username}"')
@@ -85,12 +90,20 @@ class ProfileCog(commands.Cog):
             formatter = PROFILE_SERVICES.get(service)[1]
             if formatter is not None:
                 link = formatter(username)
-                value = f"[{escape_markdown(username)}]({link})"
-                embed = embed.add_field(
-                    name=service,
-                    value=value,
-                    inline=True
-                )
+                value = f"**{service}**: [{escape_markdown(username)}]({link})"
+                accs.append(value)
+        
+        embed.add_field(
+            name="Links",
+            value="\n".join(accs)
+        )
+
+        embed.add_field(
+            name="Badges",
+            value="*Work In Progress*"
+        )
+
+        embed.set_footer(text="Unstable Feature")
 
         await ctx.send(embed=embed)
 
