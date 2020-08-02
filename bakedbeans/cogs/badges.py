@@ -164,12 +164,49 @@ class BadgeCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         # await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-    """
-    @badges.command(name='check')
-    async def badge_check(self, ctx):
+    @badges.command(name='diff')
+    @commands.has_guild_permissions(administrator=True)
+    async def badge_diff(self, ctx):
         # TODO: Validate Data and make sure there's no badge data mismatch
-        await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-    """
+        server = ctx.guild
+
+        async with self.bot.db.acquire() as conn:
+            badges = []
+            async with conn.transaction():
+                badge_list = await conn.fetch('''
+                    SELECT id, role_id, name
+                    FROM badge
+                    WHERE server_id = $1 AND
+                    role_id IS NOT NULL
+                ''', server.id)
+
+                for badge in badge_list:
+                    role = server.get_role(badge['role_id'])
+                    if badge['name'] != role.name:
+                        ctx.send(f'{badge['id']} "{badge['name']}" "{role.name}"')
+
+                    users = await conn.fetch('''
+                        SELECT uid
+                        FROM badges
+                        WHERE badge_id = $1
+                    ''', badge['id'])
+
+                    s1 = set()
+                    for user in users:
+                        s1.add(user['uid'])
+
+                    s2 = set()
+                    for member in role.members:
+                        s2.set(member.id)
+
+                    s1_2 = s1 - s2
+                    s2_1 = s2 - s1
+
+                    for u in s1_2:
+                        ctx.send(f'{badge['id']} (S1 - S2): {u}')
+                    for u in s2_1:
+                        ctx.send(f'{badge['id']} (S2 - S1): {u}')
+
 
     """
     @badges.command(name='add_user')
