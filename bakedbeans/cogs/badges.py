@@ -183,7 +183,8 @@ class BadgeCog(commands.Cog):
                 for badge in badge_list:
                     role = server.get_role(badge['role_id'])
                     if badge['name'] != role.name:
-                        ctx.send(f'{badge['id']} "{badge['name']}" "{role.name}"')
+                        _name = badge['name']
+                        ctx.send(f'{role.id} "{_name}" "{role.name}"')
 
                     users = await conn.fetch('''
                         SELECT uid
@@ -197,15 +198,17 @@ class BadgeCog(commands.Cog):
 
                     s2 = set()
                     for member in role.members:
-                        s2.set(member.id)
+                        s2.add(member.id)
 
                     s1_2 = s1 - s2
                     s2_1 = s2 - s1
 
                     for u in s1_2:
-                        ctx.send(f'{badge['id']} (S1 - S2): {u}')
+                        ctx.send(f'{role.id} (S1 - S2): {u}')
                     for u in s2_1:
-                        ctx.send(f'{badge['id']} (S2 - S1): {u}')
+                        ctx.send(f'{role.id} (S2 - S1): {u}')
+
+        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
     """
