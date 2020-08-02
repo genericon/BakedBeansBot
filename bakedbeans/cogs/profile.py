@@ -83,24 +83,25 @@ class ProfileCog(commands.Cog):
                     ORDER BY service DESC
                 ''', user.id)
 
-                results2 = await conn.fetch('''
-                    SELECT
-                    badge.name as badge_name,
-                    attendance.count as badge_count
-                    FROM badges
-                    INNER JOIN badge ON
-                    badges.badge_id = badge.id
-                    INNER JOIN (
-                        SELECT badge_id,
-                        COUNT(badge_id) as count
+                if ctx.guild is not None:
+                    results2 = await conn.fetch('''
+                        SELECT
+                        badge.name as badge_name,
+                        attendance.count as badge_count
                         FROM badges
-                        GROUP BY badge_id
-                    ) attendance USING (badge_id)
-                    WHERE
-                    badge.server_id = $1 AND
-                    badges.uid = $2
-                    ORDER BY badge.id ASC
-                ''', ctx.guild.id, user.id)
+                        INNER JOIN badge ON
+                        badges.badge_id = badge.id
+                        INNER JOIN (
+                            SELECT badge_id,
+                            COUNT(badge_id) as count
+                            FROM badges
+                            GROUP BY badge_id
+                        ) attendance USING (badge_id)
+                        WHERE
+                        badge.server_id = $1 AND
+                        badges.uid = $2
+                        ORDER BY badge.id ASC
+                    ''', ctx.guild.id, user.id)
 
         accs = []
         for rec in results1:
@@ -120,8 +121,9 @@ class ProfileCog(commands.Cog):
             )
 
         badges = []
-        for rec in results2:
-            badges.append(f"{rec['badge_name']} *({rec['badge_count']})*")
+        if ctx.guild is not None:
+            for rec in results2:
+                badges.append(f"{rec['badge_name']} *({rec['badge_count']})*")
 
         if badges:
             embed.add_field(
