@@ -166,6 +166,45 @@ class ProfileCog(commands.Cog):
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
 
+    @profile.command(name='addlink')
+    async def profile_addlink(self, ctx, user: typing.Optional[discord.User], url: str):
+        """
+        Add a link to your profile (if service is accepted)
+        """
+
+        if url.endswith('/'):
+            url = url[:-1]
+
+        if url.startswith("https://"):
+            url = url[8:]
+        elif url.startswith("http://"):
+            url = url[7:]
+
+        service = None
+        username = None
+        if url.startswith("myanimelist.net/profile/"):
+            service = 'MyAnimeList'
+            username = url[len("myanimelist.net/profile/"):]
+        elif url.startswith("anilist.co/user/"):
+            service = 'AniList'
+            username = url[len("anilist.co/user/"):]
+        elif url.startswith("github.com/"):
+            service = 'GitHub'
+            username = url[len("github.com/"):]
+        elif url.startswith("vndb.org/u"):
+            service = 'VNDB'
+            username = url[len("vndb.org/u"):]
+        elif url.startswith("myfigurecollection.net/profile/"):
+            service = 'MyFigureCollection'
+            username = url[len("myfigurecollection.net/profile/"):]
+        elif url.startswith("kitsu.io/users/"):
+            service = 'Kitsu'
+            username = url[len("kitsu.io/users/"):]
+
+        if service is not None:
+            await self.profile_add(ctx, user, service, username)
+
+
     @profile.command(name='rm')
     async def profile_rm(self, ctx, user: typing.Optional[discord.User], service: str):
         """
