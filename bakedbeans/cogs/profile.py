@@ -140,13 +140,12 @@ class ProfileCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @profile.command(name='add')
-    async def profile_add(self, ctx, user: typing.Optional[discord.User], service: str, username: str):
+    async def profile_add(self, ctx, service: str, username: str):
         """
         Add a service to your profile
         """
 
-        if user is None:
-            user = ctx.message.author
+        user = ctx.message.author
 
         if service not in PROFILE_SERVICES:
             return
@@ -168,7 +167,7 @@ class ProfileCog(commands.Cog):
 
 
     @profile.command(name='addlink')
-    async def profile_addlink(self, ctx, user: typing.Optional[discord.User], url: str):
+    async def profile_addlink(self, ctx, url: str):
         """
         Add a link to your profile (if service is accepted)
         """
@@ -203,7 +202,7 @@ class ProfileCog(commands.Cog):
             username = url[len("kitsu.io/users/"):]
 
         if service is not None:
-            await self.profile_add(ctx, user, service, username)
+            await self.profile_add(ctx, service, username)
 
 
     @profile.command(name='rm')
