@@ -8,7 +8,7 @@ from urllib.parse import quote as url_quote
 import logging
 import typing
 
-# import tempfile
+import tempfile
 
 PROFILE_SERVICES = {
     'MyAnimeList': ("https://myanimelist.net/", (lambda u: f"https://myanimelist.net/profile/{url_quote(u)}")),
@@ -223,28 +223,43 @@ class ProfileCog(commands.Cog):
 
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
 
-    """
-    @profile.command(name='export')
-    async def profile_export(self, ctx):
-        with tempfile.TemporaryFile() as fp:
-            async with self.bot.db.acquire() as conn:
-                async with conn.transaction():
-                    await conn.copy_from_table('profile_data', output=fp, format='csv')
-            fp.seek(0)
-            await ctx.send(file=discord.File(fp, 'export.csv'))
-        await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+    @profile.command(name='gdpr_dump')
+    @commands.dm_only()
+    async def profile_gdpr_dump(self, ctx):
+        user = ctx.message.author
 
+        async with self.bot.db.acquire() as conn:
+            async with conn.transaction():
+                with tempfile.TemporaryFile() as fp:
+                    await conn.copy_from_query('''
+                        SELECT
+                        uid as user_id,
+                        (each(data)).key as service,
+                        (each(data)).value as username
+                        FROM profile_data
+                        WHERE uid = $1
+                        ORDER BY service DESC
+                    ''', user.id, output=fp, format='csv')
+                    fp.seek(0)
+                    await ctx.send(file=discord.File(fp, 'profile_data.csv'))
 
-    @profile.command(name='import')
-    async def profile_import(self, ctx):
-        attached = ctx.message.attachments[0]
-        with tempfile.TemporaryFile() as fp:
-            await attached.save(fp, seek_begin=True)
-            async with self.bot.db.acquire() as conn:
-                async with conn.transaction():
-                    await conn.copy_to_table('profile_data', source=fp, format='csv')
+                with tempfile.TemporaryFile() as fp:
+                    await conn.copy_from_query('''
+                        SELECT
+                        badges.uid as user_id,
+                        badge.server_id as guild_id,
+                        badge.name as badge_name,
+                        badge.id as badge_id
+                        FROM badge
+                        INNER JOIN badges ON
+                        badges.badge_id = badge.id
+                        WHERE badges.uid = $1
+                        ORDER BY badge.id ASC
+                    ''', user.id, output=fp, format='csv')
+                    fp.seek(0)
+                    await ctx.send(file=discord.File(fp, 'profile_badges.csv'))
+
         await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
-    """
 
 
 def setup(bot):
