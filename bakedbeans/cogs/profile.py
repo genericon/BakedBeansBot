@@ -29,7 +29,8 @@ class ProfileCog(commands.Cog):
         Manage Profile
         """
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid profile command passed...')
+            # await ctx.send('Invalid profile command passed...')
+            await self.profile_view(ctx, None)
 
     @profile.command(name='services')
     async def profile_services(self, ctx):

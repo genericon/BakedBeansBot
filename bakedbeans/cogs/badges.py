@@ -15,7 +15,9 @@ class BadgeCog(commands.Cog):
         Manage Badges
         """
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid badge command passed...')
+            # await ctx.send('Invalid badge command passed...')
+            await self.badges_view(ctx, None)
+
 
     @badges.command(name='view')
     async def badges_view(self, ctx, user: typing.Optional[discord.User]):
