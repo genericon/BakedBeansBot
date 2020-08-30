@@ -47,8 +47,9 @@ def config_load():
     conf = {}
     with open('config.json', 'r', encoding='utf-8') as doc:
         conf.update(json.load(doc))
-    with open('config_secret.json', 'r', encoding='utf-8') as doc:
-        conf.update(json.load(doc))
+    if os.path.exists('config_secret.json'):
+        with open('config_secret.json', 'r', encoding='utf-8') as doc:
+            conf.update(json.load(doc))
     return conf
 
 
