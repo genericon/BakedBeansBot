@@ -3,13 +3,9 @@ name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 
-[dev-packages]
-sqlacodegen = "*"
-
 [packages]
 discord-py = "*"
 asyncpg = "*"
-pydle = "*"
 
 [requires]
 python_version = "3.8"
