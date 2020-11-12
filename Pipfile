@@ -6,6 +6,7 @@ verify_ssl = true
 [packages]
 discord-py = "*"
 asyncpg = "*"
+uvloop = "*"
 
 [requires]
 python_version = "3.8"

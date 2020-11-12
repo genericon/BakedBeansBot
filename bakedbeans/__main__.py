@@ -6,6 +6,8 @@ import os
 import time
 import socket
 
+import uvloop
+
 from .bot import BakedBeansBot
 
 
@@ -65,6 +67,7 @@ async def run():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     wait_for_it()
+    uvloop.install()
     loop = asyncio.get_event_loop()
     loop.set_debug(False)
     loop.run_until_complete(run())
